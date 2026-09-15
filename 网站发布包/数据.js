@@ -6,7 +6,7 @@ export async function 打开存档() {
   数据库 = await 请求(操作);
   return 读取();
 }
-export function 空存档() { return {版本:2, 草稿:null, 记录:[], 收藏:[], 已抽原创:[]}; }
+export function 空存档() { return {版本:3, 草稿:null, 记录:[], 收藏:[], 已抽原创:[], 消费金币:0, 背包:{}, 小段:1}; }
 export async function 读取() {
   return (await 请求(数据库.transaction('存档').objectStore('存档').get('学习'))) || 空存档();
 }
