@@ -1,5 +1,6 @@
 import {打开存档,读取,更新,总金币} from './数据.js';
 import {模块列表,奖励规则,修为等级,修为信息,兑换物品,生成练习,检查库存,可抽内容,建立题库索引,补齐旧练习,通用评分,题目分值,未答题,验证练习,新编号} from './组卷.js';
+import {初始化认证,是否已登录,获取当前用户,退出登录} from './认证.js';
 
 const 根=document.querySelector('#应用'),弹窗=document.querySelector('#对话框'),字母=['A','B','C','D'];
 const 主题列表=[['青绿','清爽青绿'],['夜间','夜间深色'],['靛蓝','安静靛蓝'],['暖橙','温暖暖橙']];
@@ -60,7 +61,11 @@ function 练习页(记录){
   const 总=c.题目编号.length;当前题=Math.max(0,Math.min(总-1,当前题));
   const q=索引.题目.get(c.题目编号[当前题]),p=q.篇章?索引.篇章.get(q.篇章):null,a=答案?.[q.编号],已选=c.作答[q.编号],锁定=!!记录||c.阶段==='自评';
   const 对数=记录?.对错.filter(Boolean).length;
-  const 文=p?`<section class="阅读原文 ${q.题型==='完形'?'完形原文':''}" lang="en"><div class="原文标题"><span class="徽标">${q.题型==='阅读'?`阅读 ${c.篇章编号.filter(id=>索引.篇章.get(id).题型==='阅读').indexOf(p.编号)+1}`:'完形原文'}</span>${记录?`<h2>${转义(p.标题)}</h2>`:''}</div><div class="文章正文">${篇章内容(p)}</div></section>`:'';
+
+  // 文章标记工具栏
+  const 标记工具=p&&!记录?`<div class="文章标记工具"><button class="图标按钮小" data-action="标记文本" data-type="重点" title="标记重点">${图标('highlighter')}重点</button><button class="图标按钮小" data-action="标记文本" data-type="疑问" title="标记疑问">${图标('help-circle')}疑问</button><button class="图标按钮小" data-action="清除标记" title="清除所有标记">${图标('eraser')}清除</button></div>`:'';
+
+  const 文=p?`<section class="阅读原文 ${q.题型==='完形'?'完形原文':''}" lang="en">${标记工具}<div class="原文标题"><span class="徽标">${q.题型==='阅读'?`阅读 ${c.篇章编号.filter(id=>索引.篇章.get(id).题型==='阅读').indexOf(p.编号)+1}`:'完形原文'}</span>${记录?`<h2>${转义(p.标题)}</h2>`:''}</div><div class="文章正文" id="文章正文">${篇章内容(p)}</div></section>`:'';
   const 作答区=q.题型==='翻译'?`<label class="翻译输入标签" for="翻译作答">你的译文</label><textarea id="翻译作答" class="翻译作答" maxlength="4000" ${锁定?'readonly':''} placeholder="输入译文">${转义(已选||'')}</textarea>`:`<div class="选项组" role="group" aria-label="答案选项">${(c.选项顺序?.[q.编号]||[0,1,2,3]).map((原,i)=>{const v=字母[原],正确=记录&&a.正确选项.includes(v),错=记录&&已选===v&&!正确;return `<button class="选项 ${已选===v?'已选':''} ${正确?'正确':''} ${错?'错误':''}" data-action="选答案" data-value="${v}" aria-pressed="${已选===v}" ${锁定?'disabled':''}><span class="选项字母">${字母[i]}</span><span class="选项内容" lang="en">${转义(q.选项[原])}</span>${正确?`<small>正确答案</small>${图标('check')}`:错?`<small>你的答案</small>${图标('x')}`:已选===v?图标('check'):''}</button>`;}).join('')}</div>`;
   return `<div class="练习头"><div><a class="按钮 轻 小" href="#主页">${图标('arrow-left')}学习主页</a><h1>${转义(c.名称)}${记录?' · 答题报告':''}</h1></div><div class="计时">${图标('clock-3')}<span id="计时">${时长(记录?记录.用时:Math.max(0,Math.floor((Date.now()-c.开始时间)/1000)))}</span></div></div>${记录?`<section class="成绩条"><div class="成绩数字">${记录.分数}<small> / ${记录.满分} 分</small></div><div class="成绩概述"><strong>${对数} 题满分 · ${总-对数} 题待巩固</strong><p>${日期(记录.提交时间)}${记录.含自评?' · 含翻译自评分':''}</p></div><div class="成绩奖励">${图标('coins')}本次已获得 ${记录.金币} 金币</div></section><div class="工具栏"><div class="分段"><button class="${只看错题?'':'当前'}" data-action="复盘筛选" data-value="全部">全部题目</button><button class="${只看错题?'当前':''}" data-action="复盘筛选" data-value="错题">只看错题 · ${总-对数}</button></div></div>`:c.阶段==='自评'?'<div class="继续条"><p>翻译自评：对照每题的 4 项评分要点，选择所得分数。客观题作答已锁定。</p></div>':''}<div class="答题布局 ${p?'含阅读':''}"><div class="题文区">${文}<article class="试题"><div class="题目头"><strong>第 ${String(当前题+1).padStart(2,'0')} 题 / ${总}</strong><span>${q.题型||'单选'} · ${数值(题目分值(c,当前题))} 分</span></div><p class="题干" lang="en">${转义(q.题干)}</p>${作答区}${记录||c.阶段==='自评'&&q.题型==='翻译'?`<section class="解析"><h3>${q.题型==='翻译'?'参考答案与评分':'答案与解析'}</h3>${解析内容(c,q,a,当前题)}${q.题型==='翻译'?记录?`<p class="徽标">自评 ${c.自评[q.编号]} / 4 · 折合 ${数值(c.单题得分[当前题])} 分</p>`:`<fieldset class="自评控件"><legend>自评得分（每个要点 1 分）</legend>${[0,1,2,3,4].map(n=>`<label><input type="radio" name="自评" value="${n}" ${c.自评[q.编号]===n?'checked':''}>${n} 分</label>`).join('')}</fieldset>`:''}<p><small>出处：${转义(q.来源)} · 原题 ${q.原题号}</small></p></section>`:''}<div class="题目操作"><button class="按钮 次要" data-action="翻题" data-step="-1" ${当前题===0?'disabled':''}>${图标('chevron-left')}上一题</button><div class="按钮组"><button class="图标按钮" data-action="收藏" aria-label="${存档.收藏.includes(q.编号)?'取消收藏':'收藏本题'}" title="收藏本题" aria-pressed="${存档.收藏.includes(q.编号)}">${图标('bookmark')}</button>${!记录?`<button class="图标按钮" data-action="标记" aria-label="标记稍后检查" title="标记稍后检查" aria-pressed="${(c.标记||[]).includes(q.编号)}">${图标('flag')}</button>`:''}</div><button class="按钮" data-action="${当前题===总-1&&!记录?'提交检查':'翻题'}" data-step="1" ${当前题===总-1&&记录?'disabled':''}>${当前题===总-1&&!记录?'提交':'下一题'}${图标('chevron-right')}</button></div></article></div>${答题卡(c,记录)}</div>`;
 }
@@ -82,7 +87,7 @@ function 兑换页(){
   const 明细=[...存档.记录].reverse().slice(0,30).map(r=>`<tr><td>${转义(r.名称)}<small>${日期(r.提交时间)}</small></td><td class="对">+${r.金币}</td></tr>`).join('');
   return `${页头('金币兑换','功法、装备和法器增加战力，丹药提升一个小段修为。',`<a class="按钮 轻" href="#修为">修为与战力 ${图标('arrow-right')}</a>`)}<section class="余额区">${图标('coins')}<div><div class="余额数">${可用金币()}</div><small>可用金币 · 累计 ${总金币(存档)} · 战力 ${当前战力()}</small></div></section>${分区}<div class="分区头"><h2>金币明细</h2></div><table class="表格"><tbody>${明细}</tbody></table>`;
 }
-function 设置页(){return `${页头('学习存档','管理答题进度、记录与收藏。')}<div class="设置行"><div><h3>当前存档</h3><p>${存档.记录.length} 次练习 · ${总金币(存档)} 金币 · ${存档.收藏.length} 道收藏</p></div><span class="徽标">本机保存</span></div><div class="设置行"><div><h3>备份与迁移</h3><p>进度保存在当前浏览器。换手机或电脑时，可导出备份后在另一设备导入。</p></div><div class="按钮组"><button class="按钮 次要" data-action="导出">${图标('download')}导出存档</button><label class="按钮 次要" for="导入文件">${图标('upload')}导入存档</label><input id="导入文件" type="file" class="隐" accept="application/json,.json"></div></div><div class="设置行"><div><h3>页面风格</h3><p>选择喜欢的颜色，设置会保存在当前浏览器。</p></div><div class="主题选择" role="group" aria-label="页面风格">${主题列表.map(([id,名])=>`<button class="${主题===id?'当前':''}" data-action="主题" data-value="${id}" aria-pressed="${主题===id}"><span class="主题色 ${id}"></span>${名}</button>`).join('')}</div></div><div class="设置行"><div><h3>原创题使用记录</h3><p>原创题在开始组卷时记为已抽，单块与整卷共享未抽题库；抽完后需要补充题库。当前原创库包含 500 道单选、60 篇阅读、20 篇完形和 100 道翻译。</p></div></div><div class="设置行"><div><h3>题目校对</h3><p>题目保留照片出处，答案与解析重新编写。新增照片中的清晰翻译和完形已纳入原题库；照片中无法确认的字词会暂不抽取。</p></div></div><div class="警告">清理浏览器数据会删除本机存档；不同设备不会自动同步，请定期备份。</div>`;}
+function 设置页(){const 用户=获取当前用户();return `${页头('学习存档','管理答题进度、记录与收藏。')}<div class="设置行"><div><h3>登录账号</h3><p>${用户?.手机号 || '未登录'}</p></div><button class="按钮 次要" data-action="退出登录">${图标('log-out')}退出登录</button></div><div class="设置行"><div><h3>当前存档</h3><p>${存档.记录.length} 次练习 · ${总金币(存档)} 金币 · ${存档.收藏.length} 道收藏</p></div><span class="徽标">本机保存</span></div><div class="设置行"><div><h3>备份与迁移</h3><p>进度保存在当前浏览器。换手机或电脑时，可导出备份后在另一设备导入。</p></div><div class="按钮组"><button class="按钮 次要" data-action="导出">${图标('download')}导出存档</button><label class="按钮 次要" for="导入文件">${图标('upload')}导入存档</label><input id="导入文件" type="file" class="隐" accept="application/json,.json"></div></div><div class="设置行"><div><h3>页面风格</h3><p>选择喜欢的颜色，设置会保存在当前浏览器。</p></div><div class="主题选择" role="group" aria-label="页面风格">${主题列表.map(([id,名])=>`<button class="${主题===id?'当前':''}" data-action="主题" data-value="${id}" aria-pressed="${主题===id}"><span class="主题色 ${id}"></span>${名}</button>`).join('')}</div></div><div class="设置行"><div><h3>原创题使用记录</h3><p>原创题在开始组卷时记为已抽，单块与整卷共享未抽题库；抽完后需要补充题库。当前原创库包含 500 道单选、60 篇阅读、20 篇完形和 100 道翻译。</p></div></div><div class="设置行"><div><h3>题目校对</h3><p>题目保留照片出处，答案与解析重新编写。新增照片中的清晰翻译和完形已纳入原题库；照片中无法确认的字词会暂不抽取。</p></div></div><div class="警告">清理浏览器数据会删除本机存档；不同设备不会自动同步，请定期备份。</div>`;}
 async function 渲染(){const 序=++渲染序,[页,id,qid]=路由();try{应用主题();if(页==='结果'||页==='练习'&&存档.草稿?.阶段==='自评')await 载入答案();if(序!==渲染序)return;let 内容;const 原题模块={选择题:'单选',阅读理解:'阅读',完形填空:'完形',翻译:'翻译'};if(页==='主页')内容=主页();else if(原题模块[页])内容=原题页(原题模块[页]);else if(页==='单块模拟题')内容=模拟页();else if(页==='全套卷子模拟题')内容=模拟页(true);else if(页==='练习')内容=练习页();else if(页==='结果'){const r=存档.记录.find(x=>x.编号===id);if(qid&&r)当前题=Math.max(0,r.题目编号.indexOf(qid));内容=r?练习页(r):'<div class="空状态"><h2>未找到记录</h2><a href="#记录">返回记录</a></div>';}else if(页==='记录')内容=记录页();else if(页==='错题本')内容=错题页();else if(页==='修为')内容=修为页();else if(页==='兑换')内容=兑换页();else if(页==='设置')内容=设置页();else{导航('主页');return;}外壳(内容,页);}catch(e){错误提示(e);外壳(`<div class="空状态"><h2>页面加载失败</h2><p>${转义(e.message)}</p><button class="按钮" data-action="重试">重新加载</button></div>`,页);}document.title=`${页} · 升本练习室`;}
 async function 开始(题源,模块,强制=false){
   if(忙)return;await 写入队列;
@@ -104,6 +109,26 @@ async function 提交检查(){
 async function 提交(){if(忙)return;忙=true;try{await 写入队列;await 载入答案();const c=存档.草稿;if(!c)throw new Error('没有可提交的练习。');const 分=通用评分(c,答案);let 旧金币,新增=false;const r={...c,...分,用时:Math.max(0,Math.floor((Date.now()-c.开始时间)/1000)),提交时间:Date.now()};存档=await 更新(s=>{旧金币=总金币(s);if(s.记录.some(x=>x.编号===c.编号))return s;if(s.草稿?.编号!==c.编号||JSON.stringify(s.草稿.作答)!==JSON.stringify(c.作答)||JSON.stringify(s.草稿.自评)!==JSON.stringify(c.自评))throw new Error('其他页面已更改作答，请刷新后提交。');新增=true;return {...s,记录:[...s.记录,r],草稿:null};});弹窗.close();当前题=0;只看错题=false;导航(`结果/${c.编号}`);await 渲染();const 前=修为信息(旧金币).当前,后=修为信息(总金币(存档)).当前;if(新增&&前.名称!==后.名称){弹窗.innerHTML=`<div class="升级提示">${图标('award')}<p>修为提升</p><h2>${后.名称}</h2><p>${前.名称} ${图标('arrow-right')} ${后.名称}</p><p>累计获得 ${总金币(存档)} 金币</p><button class="按钮 满" data-action="关闭">继续修行</button></div>`;弹窗.showModal();globalThis.lucide?.createIcons();}else 提示(`提交成功，获得 ${分.金币} 金币。`);}finally{忙=false;}}
 async function 处理点击(b){if(!b||b.disabled)return;const 行=b.dataset.action;try{
   if(行==='关闭'){弹窗.close();return;}if(行==='重试'){await 渲染();return;}if(行==='开始'){await 开始(b.dataset.source,b.dataset.module);return;}if(行==='替换确认'){弹窗.close();await 开始(待开始.题源,待开始.模块,true);return;}if(行==='提交检查'){await 提交检查();return;}if(行==='提交确认'){await 提交();return;}if(行==='兑换物品'){await 兑换(b.dataset.id);return;}if(行==='服用丹药'){await 服用(b.dataset.id);return;}
+  if(行==='退出登录'){退出登录();location.href='./login.html';return;}
+  if(行==='标记文本'){
+    const 类型=b.dataset.type;
+    const 选中=window.getSelection();
+    if(选中.rangeCount===0||选中.toString().trim()==='')return;
+    const 范围=选中.getRangeAt(0);
+    const 文章=document.getElementById('文章正文');
+    if(!文章||!文章.contains(范围.commonAncestorContainer))return;
+    const 标记=document.createElement('span');
+    标记.className=`标记 ${类型}`;
+    try{范围.surroundContents(标记);选中.removeAllRanges();}catch(e){console.warn('标记失败',e);}
+  }else{
+  }
+  if(行==='清除标记'){
+    const 文章=document.getElementById('文章正文');
+    if(!文章)return;
+    文章.querySelectorAll('.标记').forEach(el=>{const 文本=el.textContent;el.replaceWith(文本);});
+    提示('已清除所有标记');
+    return;
+  }
   if(行==='主题'){主题=b.dataset.value;localStorage.setItem('升本练习室主题',主题);应用主题();await 渲染();提示(`已切换为${主题列表.find(x=>x[0]===主题)?.[1]||'新风格'}。`);return;}
   if(行==='进入自评'){await 写入队列;await 载入答案();const c=存档.草稿;if(!c)return;await 修改草稿(c.编号,d=>{if(未答题(d).length)throw new Error('还有未作答题目，请完成后再进入自评。');return {...d,阶段:'自评'};});当前题=c.单元.findIndex(q=>q.题型==='翻译');弹窗.close();await 渲染();return;}
   if(行==='导出'){await 写入队列;const s=await 读取(),url=URL.createObjectURL(new Blob([JSON.stringify({应用:'升本练习室',导出时间:Date.now(),存档:s},null,2)],{type:'application/json;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=`升本练习室存档-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return;}
@@ -122,4 +147,15 @@ async function 执行导入(){if(!待导入||忙)return;忙=true;try{await 载�
 window.addEventListener('hashchange',async()=>{await 写入队列;当前题=路由()[0]==='练习'?(存档?.草稿?.当前题||0):0;只看错题=false;await 渲染();window.scrollTo(0,0);});
 window.addEventListener('focus',async()=>{if(!存档||忙)return;try{await 写入队列;存档=await 读取();await 渲染();}catch(e){错误提示(e);}});
 setInterval(()=>{const el=document.querySelector('#计时');if(el&&路由()[0]==='练习'&&存档?.草稿)el.textContent=时长(Math.max(0,Math.floor((Date.now()-存档.草稿.开始时间)/1000)));},1000);
-try{const r=await fetch('./题库.json',{cache:'no-cache'});if(!r.ok)throw new Error('题库加载失败。');题库=await r.json();索引=建立题库索引(题库);存档=await 打开存档();if(存档.版本!==3||存档.记录.some(r=>r.版本!==2)||存档.草稿&&存档.草稿.版本!==2){await 载入答案();存档=await 更新(s=>({...s,版本:3,消费金币:Number(s.消费金币)||0,背包:s.背包||{},小段:Math.max(1,Math.min(9,Number(s.小段)||1)),已抽原创:s.已抽原创||[],记录:s.记录.map(r=>{if(r.版本===2)return r;const c=补齐旧练习(r,题库);return {...c,...通用评分(c,答案)};}),草稿:s.草稿?补齐旧练习(s.草稿,题库):null}));}当前题=存档.草稿?.当前题||0;await 渲染();const 导入提示=sessionStorage.getItem('升本练习室导入提示');if(导入提示){sessionStorage.removeItem('升本练习室导入提示');提示(导入提示);}}catch(e){根.innerHTML=`<div class="空状态"><h1>练习室暂时无法打开</h1><p>${转义(e.message)}</p><button class="按钮" onclick="location.reload()">重新加载</button></div>`;}
+try{
+  // 初始化认证系统
+  await 初始化认证();
+
+  // 检查登录状态
+  if(!是否已登录()){
+    // 未登录，跳转到登录页
+    location.href='./login.html';
+  }else{
+
+  const r=await fetch('./题库.json',{cache:'no-cache'});if(!r.ok)throw new Error('题库加载失败。');题库=await r.json();索引=建立题库索引(题库);存档=await 打开存档();if(存档.版本!==3||存档.记录.some(r=>r.版本!==2)||存档.草稿&&存档.草稿.版本!==2){await 载入答案();存档=await 更新(s=>({...s,版本:3,消费金币:Number(s.消费金币)||0,背包:s.背包||{},小段:Math.max(1,Math.min(9,Number(s.小段)||1)),已抽原创:s.已抽原创||[],记录:s.记录.map(r=>{if(r.版本===2)return r;const c=补齐旧练习(r,题库);return {...c,...通用评分(c,答案)};}),草稿:s.草稿?补齐旧练习(s.草稿,题库):null}));}当前题=存档.草稿?.当前题||0;await 渲染();const 导入提示=sessionStorage.getItem('升本练习室导入提示');if(导入提示){sessionStorage.removeItem('升本练习室导入提示');提示(导入提示);}}
+}catch(e){根.innerHTML=`<div class="空状态"><h1>练习室暂时无法打开</h1><p>${转义(e.message)}</p><button class="按钮" onclick="location.reload()">重新加载</button></div>`;}
