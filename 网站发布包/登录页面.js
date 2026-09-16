@@ -6,6 +6,8 @@ const 元素 = {
   表单: document.querySelector('#认证表单'),
   标题: document.querySelector('#表单标题'),
   手机号: document.querySelector('#手机号'),
+  名称: document.querySelector('#名称'),
+  名称组: document.querySelector('#名称组'),
   密码: document.querySelector('#密码'),
   确认密码: document.querySelector('#确认密码'),
   确认密码组: document.querySelector('#确认密码组'),
@@ -20,12 +22,14 @@ const 元素 = {
 
   if (当前模式 === '注册') {
     元素.标题.textContent = '注册';
+    元素.名称组.style.display = 'block';
     元素.确认密码组.style.display = 'block';
     元素.提交按钮.textContent = '注册';
     元素.切换文字.textContent = '已有账号？';
     元素.切换按钮.textContent = '立即登录';
   } else {
     元素.标题.textContent = '登录';
+    元素.名称组.style.display = 'none';
     元素.确认密码组.style.display = 'none';
     元素.提交按钮.textContent = '登录';
     元素.切换文字.textContent = '还没有账号？';
@@ -63,6 +67,7 @@ const 元素 = {
 
   const 手机号 = 元素.手机号.value.trim();
   const 密码 = 元素.密码.value;
+  const 名称 = 元素.名称.value.trim();
 
   // 验证手机号
   if (!/^1[3-9]\d{9}$/.test(手机号)) {
@@ -83,6 +88,10 @@ const 元素 = {
       显示错误(元素.确认密码.parentElement, '两次输入的密码不一致');
       return;
     }
+    if (名称.length > 20) {
+      显示错误(元素.名称.parentElement, '名称最多20个字符');
+      return;
+    }
   }
 
   元素.提交按钮.disabled = true;
@@ -90,7 +99,7 @@ const 元素 = {
 
   try {
     if (当前模式 === '注册') {
-      await 注册用户(手机号, 密码);
+      await 注册用户(手机号, 密码, 名称);
       显示成功('注册成功！');
     } else {
       await 用户登录(手机号, 密码);

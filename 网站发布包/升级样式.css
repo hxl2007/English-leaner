@@ -4,3 +4,22 @@
 @media(max-width:1150px){.顶栏{padding:0 24px}.模拟入口{gap:16px}.成长横栏{gap:16px}.成长横栏>.按钮{padding:10px}.答题布局{grid-template-columns:minmax(0,1fr) 220px}}
 @media(max-width:900px){.顶栏右{gap:10px}.修为徽记 svg{display:none}.面包屑>span{display:none}.模拟入口>a{padding:20px 0}.成长横栏 img{width:80px;height:84px}}
 @media(max-width:680px){.套题列表{grid-template-columns:1fr}.顶栏{padding:0 16px}.顶栏右>.图标按钮{display:none}.修为徽记{font-size:11px}.金币 span{display:none}.模拟入口{grid-template-columns:1fr;gap:0}.模拟入口>a+a{border-top:1px solid var(--线)}.成长横栏{flex-wrap:wrap;gap:14px}.成长横栏 h2{font-size:15px}.成长横栏>.按钮{margin-left:94px}.题文区{width:100%}.文章正文{font-size:18px;line-height:1.9}.阅读原文{padding:0 2px 18px}.答题卡{max-height:none;overflow:visible}.题号网格{max-width:none}.修为阶梯{grid-template-columns:repeat(3,minmax(0,1fr))}.修为阶梯>div{padding:16px 7px;font-size:13px}.修为阶梯 small{font-size:11px}.分段{gap:18px}.题目操作 .按钮{padding:9px 10px}.题目操作 .图标按钮{width:33px}.练习头 h1{font-size:19px}.选项{align-items:flex-start}.选项 small{align-self:center}.面包屑{min-width:0}.面包屑 strong{overflow-wrap:anywhere}.文章表格 table{font-size:15px}.套题项脚{flex-wrap:wrap}.含阅读 .选项组{left:0;padding:14px 16px;max-height:280px}.含阅读 .试题{padding-bottom:300px}.文章标记工具{position:static;margin-bottom:12px}.文章标记工具 .图标按钮小{min-height:36px;font-size:12px}}
+
+/* 阅读和完形的独立固定答题面板 */
+.含阅读{padding-bottom:330px}
+.含阅读 .阅读答题窗{position:fixed;left:224px;right:0;bottom:0;z-index:20;background:var(--纸,#fff);border-top:2px solid var(--线);box-shadow:0 -8px 24px rgba(28,54,42,.12);padding:14px 30px max(16px,env(safe-area-inset-bottom));max-height:min(46vh,430px);overflow-y:auto}
+.阅读答题窗 .题目头{max-width:1400px;margin:0 auto;padding:0 0 8px}
+.阅读答题窗 .题干{max-width:1400px;margin:0 auto 12px;font:17px/1.55 Georgia,"Times New Roman",serif}
+.阅读答题窗 .选项组{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:1400px;margin:0 auto;max-height:none;overflow:visible;padding:0;background:transparent;border:0;box-shadow:none}
+.阅读答题窗 .选项{min-height:48px;padding:9px 12px;font-size:15px;line-height:1.4}
+.阅读答题窗 .题目操作{max-width:1400px;margin:12px auto 0;padding-top:12px}
+.阅读答题窗 .解析{max-width:1400px;margin:12px auto 0;padding-top:12px}
+.首页问候{display:flex;align-items:baseline;gap:10px;margin:-8px 0 24px;color:var(--绿);font-size:18px;font-weight:650}
+.首页问候 small{font-size:12px;color:var(--灰);font-weight:400}
+.管理员面板{margin:28px 0;border-top:1px solid var(--线);border-bottom:1px solid var(--线);padding:4px 0 20px}
+.管理员表格包{overflow-x:auto;width:100%}
+.管理员表格{min-width:760px}
+.管理员表格 .按钮{white-space:nowrap}
+@media(max-width:1150px){.含阅读 .阅读答题窗{left:190px}}
+@media(max-width:900px){.含阅读 .阅读答题窗{left:76px;padding-left:20px;padding-right:20px}}
+@media(max-width:680px){.含阅读{padding-bottom:410px}.含阅读 .阅读答题窗{left:0;right:0;padding:12px 14px max(16px,env(safe-area-inset-bottom));max-height:52vh}.阅读答题窗 .题干{font-size:16px;line-height:1.45;margin-bottom:10px}.阅读答题窗 .选项组{grid-template-columns:1fr;gap:6px}.阅读答题窗 .选项{min-height:44px;font-size:14px;padding:8px 10px}.阅读答题窗 .题目操作{margin-top:8px;padding-top:8px}.管理员表格{min-width:760px}}

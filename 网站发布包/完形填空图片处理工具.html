@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>完形填空图片OCR处理工具</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; background: #f5f5f5; }
+    .container { max-width: 1400px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { color: #2c5f2d; margin-bottom: 10px; }
+    .subtitle { color: #666; margin-bottom: 30px; }
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
+    .panel { background: #f9f9f9; padding: 20px; border-radius: 6px; }
+    h2 { font-size: 18px; margin-bottom: 15px; color: #333; }
+    .image-zone { border: 2px dashed #ccc; border-radius: 6px; padding: 20px; text-align: center; min-height: 200px; background: white; cursor: pointer; transition: all 0.2s; }
+    .image-zone:hover { border-color: #2c5f2d; background: #f0f5f0; }
+    .image-zone.dragover { border-color: #2c5f2d; background: #e8f5e9; }
+    #preview { max-width: 100%; height: auto; margin-top: 10px; border-radius: 4px; }
+    textarea { width: 100%; min-height: 400px; padding: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; line-height: 1.8; font-family: 'Courier New', monospace; resize: vertical; }
+    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+    button { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; }
+    .btn-primary { background: #2c5f2d; color: white; }
+    .btn-primary:hover { background: #1e4620; }
+    .btn-secondary { background: #6c757d; color: white; }
+    .btn-secondary:hover { background: #5a6268; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-success:hover { background: #218838; }
+    .info { background: #e8f4f8; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #2c5f2d; }
+    .info strong { display: block; margin-bottom: 5px; }
+    .output-zone { background: white; padding: 15px; border: 1px solid #ddd; border-radius: 6px; margin-top: 15px; min-height: 200px; max-height: 400px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 13px; }
+    .hint { color: #666; font-size: 13px; margin-top: 10px; }
+    input[type="file"] { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📸 完形填空图片 OCR 处理工具</h1>
+    <p class="subtitle">将完形填空图片转换为结构化文本数据</p>
+
+    <div class="info">
+      <strong>📋 使用说明：</strong>
+      <ol style="margin-left: 20px; margin-top: 8px; line-height: 1.8;">
+        <li>上传或拖拽完形填空图片到左侧区域</li>
+        <li>在右侧文本框中手动输入或使用在线OCR工具提取文字</li>
+        <li>标注空格位置：在需要填空的位置输入 <code>{{1}}</code>、<code>{{2}}</code> 等</li>
+        <li>点击"生成JSON数据"获取结构化数据，复制到题库中</li>
+      </ol>
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <h2>📷 图片预览</h2>
+        <div class="image-zone" id="dropZone">
+          <p style="color: #999; margin-bottom: 10px;">🖼️ 点击选择图片或拖拽到此处</p>
+          <p style="color: #666; font-size: 13px;">支持 JPG、PNG 格式</p>
+          <input type="file" id="fileInput" accept="image/*">
+          <img id="preview" style="display: none;">
+        </div>
+
+        <div class="btn-group">
+          <button class="btn-secondary" onclick="document.getElementById('fileInput').click()">
+            📁 选择图片
+          </button>
+          <button class="btn-secondary" onclick="openOCR()">
+            🔍 使用在线OCR
+          </button>
+        </div>
+
+        <p class="hint">💡 推荐在线OCR工具：<br>
+          • <a href="https://web.baimiaoapp.com/" target="_blank">白描网页版</a>（国内，免费）<br>
+          • <a href="https://www.onlineocr.net/" target="_blank">OnlineOCR</a>（国际，无需注册）
+        </p>
+      </div>
+
+      <div class="panel">
+        <h2>📝 文章文本（标注空格位置）</h2>
+        <textarea id="textContent" placeholder="在这里输入或粘贴OCR识别的文字...&#10;&#10;在需要填空的地方输入：{{1}}、{{2}}、{{3}} 等&#10;&#10;例如：&#10;A university teacher began an amazing {{1}} under the ocean. He stayed in a special underwater {{2}} for one hundred days..."></textarea>
+
+        <div class="btn-group">
+          <button class="btn-primary" onclick="generateJSON()">
+            ✅ 生成 JSON 数据
+          </button>
+          <button class="btn-secondary" onclick="clearAll()">
+            🗑️ 清空
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top: 30px;">
+      <h2>📦 生成的 JSON 数据</h2>
+      <div class="output-zone" id="output">
+        <p style="color: #999;">生成的数据将显示在这里...</p>
+      </div>
+      <div class="btn-group">
+        <button class="btn-success" onclick="copyJSON()" id="copyBtn" style="display: none;">
+          📋 复制 JSON
+        </button>
+        <button class="btn-secondary" onclick="downloadJSON()" id="downloadBtn" style="display: none;">
+          💾 下载 JSON
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentImage = null;
+    let generatedData = null;
+
+    // 拖拽上传
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        loadImage(file);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) loadImage(file);
+    });
+
+    function loadImage(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+        currentImage = file;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function openOCR() {
+      window.open('https://web.baimiaoapp.com/', '_blank');
+    }
+
+    function generateJSON() {
+      const text = document.getElementById('textContent').value.trim();
+      if (!text) {
+        alert('请先输入文章文本！');
+        return;
+      }
+
+      // 检查是否包含空格标记
+      const blanks = text.match(/\{\{(\d+)\}\}/g);
+      if (!blanks || blanks.length === 0) {
+        alert('请在文本中标注空格位置，例如：{{1}}、{{2}} 等');
+        return;
+      }
+
+      if (blanks.length !== 20) {
+        if (!confirm(`检测到 ${blanks.length} 个空格，完形填空需要 20 个空格。是否继续？`)) {
+          return;
+        }
+      }
+
+      // 将文本分段（每个{{}}标记一段）
+      const segments = text.split(/\{\{\d+\}\}/);
+      const paragraphs = [];
+
+      // 第一段是纯文本
+      if (segments[0].trim()) {
+        paragraphs.push(segments[0].trim());
+      }
+
+      // 后续段落包含空格标记
+      for (let i = 1; i < segments.length; i++) {
+        if (segments[i].trim()) {
+          paragraphs.push(`${segments[i].trim()} {{${i}}}`);
+        } else {
+          paragraphs.push(`{{${i}}}`);
+        }
+      }
+
+      // 生成题目编号
+      const clozeId = `原题完形${String(Math.floor(Math.random() * 900) + 100)}`;
+      const questionIds = [];
+      const questions = [];
+
+      for (let i = 1; i <= blanks.length; i++) {
+        const qid = `${clozeId}-${String(i).padStart(2, '0')}`;
+        questionIds.push(qid);
+        questions.push({
+          编号: qid,
+          题型: '完形',
+          题源: '原题',
+          可抽取: true,
+          题干: `第${i}空`,
+          选项: ['选项A', '选项B', '选项C', '选项D'],
+          篇章: clozeId
+        });
+      }
+
+      generatedData = {
+        篇章: {
+          编号: clozeId,
+          题型: '完形',
+          标题: '请修改标题',
+          题目编号: questionIds,
+          段落: paragraphs
+        },
+        题目: questions
+      };
+
+      // 显示结果
+      const output = document.getElementById('output');
+      output.innerHTML = `<pre>${JSON.stringify(generatedData, null, 2)}</pre>`;
+      document.getElementById('copyBtn').style.display = 'inline-block';
+      document.getElementById('downloadBtn').style.display = 'inline-block';
+    }
+
+    function copyJSON() {
+      if (!generatedData) return;
+      const text = JSON.stringify(generatedData, null, 2);
+      navigator.clipboard.writeText(text).then(() => {
+        alert('✅ JSON 数据已复制到剪贴板！');
+      });
+    }
+
+    function downloadJSON() {
+      if (!generatedData) return;
+      const text = JSON.stringify(generatedData, null, 2);
+      const blob = new Blob([text], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${generatedData.篇章.编号}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function clearAll() {
+      document.getElementById('textContent').value = '';
+      document.getElementById('output').innerHTML = '<p style="color: #999;">生成的数据将显示在这里...</p>';
+      document.getElementById('copyBtn').style.display = 'none';
+      document.getElementById('downloadBtn').style.display = 'none';
+      generatedData = null;
+    }
+  </script>
+</body>
+</html>
