@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登录 · 升本练习室</title>
+  <link rel="icon" href="./学习图标.png" type="image/png">
+  <link rel="stylesheet" href="./登录页面.css">
+</head>
+<body>
+  <div class="登录壳">
+    <div class="登录卡">
+      <div class="标识">
+        <img src="./学习图标.png" alt="升本练习室">
+        <strong>升本练习室</strong>
+      </div>
+      <h1 id="表单标题">登录</h1>
+      <p class="副标题">专升本英语 · 随时随地学习</p>
+
+      <form id="认证表单">
+        <div class="表单组">
+          <label for="手机号">手机号</label>
+          <input type="tel" id="手机号" placeholder="请输入手机号" maxlength="11" required>
+          <p class="错误提示">请输入正确的手机号码</p>
+        </div>
+
+        <div class="表单组">
+          <label for="密码">密码</label>
+          <input type="password" id="密码" placeholder="请输入密码" required>
+          <p class="错误提示">密码至少需要6位</p>
+        </div>
+
+        <div class="表单组" id="确认密码组" style="display:none">
+          <label for="确认密码">确认密码</label>
+          <input type="password" id="确认密码" placeholder="请再次输入密码">
+          <div class="密码强度"><div></div></div>
+          <p class="错误提示">两次输入的密码不一致</p>
+        </div>
+
+        <button type="submit" class="提交按钮" id="提交按钮">登录</button>
+      </form>
+
+      <div class="切换提示">
+        <span id="切换文字">还没有账号？</span>
+        <button type="button" id="切换模式">立即注册</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./登录页面.js"></script>
+</body>
+</html>

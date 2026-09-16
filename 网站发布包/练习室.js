@@ -153,9 +153,11 @@ try{
 
   // 检查登录状态
   if(!是否已登录()){
-    // 未登录，跳转到登录页
+    // 未登录，标记并跳转到登录页
+    sessionStorage.setItem('刚从主页跳转', 'true');
     location.href='./login.html';
-  }else{
+    return;
+  }
 
-  const r=await fetch('./题库.json',{cache:'no-cache'});if(!r.ok)throw new Error('题库加载失败。');题库=await r.json();索引=建立题库索引(题库);存档=await 打开存档();if(存档.版本!==3||存档.记录.some(r=>r.版本!==2)||存档.草稿&&存档.草稿.版本!==2){await 载入答案();存档=await 更新(s=>({...s,版本:3,消费金币:Number(s.消费金币)||0,背包:s.背包||{},小段:Math.max(1,Math.min(9,Number(s.小段)||1)),已抽原创:s.已抽原创||[],记录:s.记录.map(r=>{if(r.版本===2)return r;const c=补齐旧练习(r,题库);return {...c,...通用评分(c,答案)};}),草稿:s.草稿?补齐旧练习(s.草稿,题库):null}));}当前题=存档.草稿?.当前题||0;await 渲染();const 导入提示=sessionStorage.getItem('升本练习室导入提示');if(导入提示){sessionStorage.removeItem('升本练习室导入提示');提示(导入提示);}}
+  const r=await fetch('./题库.json',{cache:'no-cache'});if(!r.ok)throw new Error('题库加载失败。');题库=await r.json();索引=建立题库索引(题库);存档=await 打开存档();if(存档.版本!==3||存档.记录.some(r=>r.版本!==2)||存档.草稿&&存档.草稿.版本!==2){await 载入答案();存档=await 更新(s=>({...s,版本:3,消费金币:Number(s.消费金币)||0,背包:s.背包||{},小段:Math.max(1,Math.min(9,Number(s.小段)||1)),已抽原创:s.已抽原创||[],记录:s.记录.map(r=>{if(r.版本===2)return r;const c=补齐旧练习(r,题库);return {...c,...通用评分(c,答案)};}),草稿:s.草稿?补齐旧练习(s.草稿,题库):null}));}当前题=存档.草稿?.当前题||0;await 渲染();const 导入提示=sessionStorage.getItem('升本练习室导入提示');if(导入提示){sessionStorage.removeItem('升本练习室导入提示');提示(导入提示);}
 }catch(e){根.innerHTML=`<div class="空状态"><h1>练习室暂时无法打开</h1><p>${转义(e.message)}</p><button class="按钮" onclick="location.reload()">重新加载</button></div>`;}

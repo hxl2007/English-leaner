@@ -1,0 +1,38 @@
+:root{font-family:Inter,"Microsoft YaHei","PingFang SC",system-ui,sans-serif;--绿:#18745e;--深绿:#125c49;--浅绿:#eaf4ef;--灰:#738079;--线:#e2e8e4;--红:#bc4349;--浅红:#fff0f0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:inherit;color:#26342f;background:#f7f9f8}
+.登录壳{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#18745e 0%,#0d5041 100%);padding:20px;position:relative}
+.登录壳::before{content:"";position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");opacity:.4}
+.登录卡{background:#fff;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.2);width:100%;max-width:420px;padding:44px 40px;position:relative;z-index:1}
+.登录卡 h1{text-align:center;font-size:28px;margin-bottom:8px;color:#26342f;font-weight:700}
+.登录卡 .副标题{text-align:center;color:var(--灰);font-size:14px;margin-bottom:36px;line-height:1.6}
+.表单组{margin-bottom:22px}
+.表单组 label{display:block;font-size:13px;font-weight:600;color:#32433a;margin-bottom:8px}
+.表单组 input{width:100%;border:1px solid var(--线);border-radius:6px;padding:12px 14px;font-size:15px;transition:all .2s;background:#fff;color:#26342f}
+.表单组 input:focus{outline:none;border-color:var(--绿);box-shadow:0 0 0 3px rgba(24,116,94,.1)}
+.表单组 input::placeholder{color:#a4b0a8}
+.表单组 .错误提示{color:var(--红);font-size:12px;margin-top:6px;display:none}
+.表单组.错误 input{border-color:var(--红);background:var(--浅红)}
+.表单组.错误 .错误提示{display:block}
+.提交按钮{width:100%;background:var(--绿);color:#fff;border:none;border-radius:6px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:12px}
+.提交按钮:hover{background:var(--深绿);transform:translateY(-2px);box-shadow:0 8px 20px rgba(24,116,94,.3)}
+.提交按钮:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.切换提示{text-align:center;margin-top:28px;font-size:14px;color:var(--灰)}
+.切换提示 button{color:var(--绿);font-weight:600;background:none;border:none;cursor:pointer;padding:0;margin-left:4px}
+.切换提示 button:hover{text-decoration:underline;color:var(--深绿)}
+.密码强度{height:4px;background:#e5ece7;border-radius:2px;margin-top:8px;overflow:hidden}
+.密码强度 div{height:100%;transition:width .3s,background .3s}
+.密码强度.弱 div{width:33%;background:var(--红)}
+.密码强度.中 div{width:66%;background:#ed8936}
+.密码强度.强 div{width:100%;background:#48bb78}
+.登录成功提示{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:48px 40px;text-align:center;z-index:1000;animation:弹出 .3s}
+.登录成功提示 svg{width:64px;height:64px;color:#48bb78;margin-bottom:20px}
+.登录成功提示 h2{font-size:24px;margin-bottom:12px;color:#26342f}
+.登录成功提示 p{color:var(--灰);font-size:14px}
+.标识{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:32px}
+.标识 img{width:40px;height:40px;border-radius:8px}
+.标识 strong{font-size:20px;color:#26342f}
+@keyframes 弹出{from{opacity:0;transform:translate(-50%,-50%) scale(.9)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.遮罩{position:fixed;inset:0;background:rgba(18,92,73,.7);z-index:999;animation:淡入 .3s;backdrop-filter:blur(4px)}
+@keyframes 淡入{from{opacity:0}to{opacity:1}}
+@media(max-width:480px){.登录卡{padding:36px 28px}.登录卡 h1{font-size:24px}.标识{margin-bottom:24px}.标识 img{width:36px;height:36px}.标识 strong{font-size:18px}}
