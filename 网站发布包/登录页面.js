@@ -1,6 +1,8 @@
 import { 初始化认证, 注册用户, 用户登录, 是否已登录 } from './认证.js';
 
 let 当前模式 = '登录'; // '登录' 或 '注册'
+const 账户提示=sessionStorage.getItem('账户提示');
+if(账户提示){document.querySelector('.副标题').textContent=账户提示;sessionStorage.removeItem('账户提示');}
 
 const 元素 = {
   表单: document.querySelector('#认证表单'),

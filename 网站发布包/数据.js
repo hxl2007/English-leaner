@@ -1,4 +1,7 @@
 import {获取当前用户} from './认证.js';
+import {合并练习记录} from './每日复习.js';
+import {合并境界小段} from './修行商城.js';
+import {修为信息} from './组卷.js';
 import {云端请求} from './云端接口.js';
 const 请求=操作=>new Promise((完成,拒绝)=>{操作.onsuccess=()=>完成(操作.result);操作.onerror=()=>拒绝(操作.error);});
 let 数据库,同步队列=Promise.resolve(),正在同步=false,需要拉取=false,同步状态={状态:'未同步',说明:'正在读取学习进度'};
@@ -13,11 +16,11 @@ function 本地写入(值,键=当前存档键()){
 function 云端数据(存档){const {云端版本,待同步,...内容}=存档;return 内容;}
 export function 合并并发存档(本地,云端){
  const 新=本地.更新时间>=云端.更新时间?本地:云端,旧=新===本地?云端:本地;
- const 记录=[...new Map([...旧.记录,...新.记录].map(r=>[r.编号,r])).values()].sort((a,b)=>a.提交时间-b.提交时间);
+ const 记录=合并练习记录(新.记录,旧.记录);
  let 草稿=新.草稿;
  if(本地.草稿&&云端.草稿&&本地.草稿.编号===云端.草稿.编号)草稿={...旧.草稿,...新.草稿,作答:{...旧.草稿.作答,...新.草稿.作答},自评:{...旧.草稿.自评,...新.草稿.自评}};
  if(草稿&&记录.some(r=>r.编号===草稿.编号))草稿=null;
- return {...旧,...新,记录,草稿,收藏:[...new Set([...本地.收藏,...云端.收藏])],已抽原创:[...new Set([...本地.已抽原创,...云端.已抽原创])],消费金币:Math.max(本地.消费金币||0,云端.消费金币||0),小段:Math.max(本地.小段||1,云端.小段||1),背包:新.背包||{},待同步:true};
+ return {...旧,...新,记录,草稿,收藏:[...new Set([...本地.收藏,...云端.收藏])],已抽原创:[...new Set([...本地.已抽原创,...云端.已抽原创])],消费金币:Math.max(本地.消费金币||0,云端.消费金币||0),小段:Math.max(本地.小段||1,云端.小段||1),境界小段:合并境界小段(本地,云端,修为信息(累计修为(本地)).当前.名称,修为信息(累计修为(云端)).当前.名称),背包:新.背包||{},待同步:true};
 }
 async function 拉取合并(键){
  const 云=await 云端请求('/api/archive'),本=await 本地读取(键),版本=Number(云.updatedAt)||0;
@@ -80,5 +83,6 @@ export function 更新(操作){
 }
 export const 判题=(题目编号,作答,答案)=>答案[题目编号].正确选项.includes(作答[题目编号]);
 export function 评分(题目编号,作答,答案){if(题目编号.length!==25||!题目编号.every(q=>/^[ABCD]$/.test(作答[q]||'')))throw new Error('请完成全部 25 道题后再提交。');const 对错=题目编号.map(q=>判题(q,作答,答案));const 正确=对错.filter(Boolean).length;return {对错,分数:正确*4,金币:正确};}
-export const 总金币=存档=>存档.记录.reduce((合计,r)=>合计+Number(r.金币||0),0);
+export const 累计修为=存档=>合并练习记录(存档.记录).reduce((n,r)=>n+Math.max(0,Number(r.修为??r.金币)||0),0);
+export const 总金币=存档=>合并练习记录(存档.记录).reduce((合计,r)=>合计+Number(r.金币||0),0);
 window.addEventListener('online',()=>{if(数据库)同步存档();});

@@ -17,7 +17,7 @@ export async function 云端请求(路径,选项={}){
   const r=await fetch(地址+路径,{...选项,headers,signal:控制.signal,cache:'no-store'});
   if(!r.headers.get('content-type')?.includes('application/json'))throw new Error('账户服务返回异常，请检查发布包与后端是否已更新。');
   const 数据=await r.json();
-  if(!r.ok){const e=new Error(数据.error||'云端请求失败（'+r.status+'）');e.status=r.status;e.data=数据;throw e;}
+  if(!r.ok){const e=new Error(数据.error||'云端请求失败（'+r.status+'）');e.status=r.status;e.data=数据;if(r.status===429)e.message+=` ${Math.ceil((数据.retryAfter||60)/60)} 分钟后可重试。`;if(r.status===401&&!['/api/login','/api/register','/api/logout'].includes(路径))window.dispatchEvent(new CustomEvent('账户失效'));throw e;}
   return 数据;
  }catch(e){
   if(e.name==='AbortError'||e instanceof TypeError)throw new Error('无法连接云端账户服务，请检查网络后重试。此次操作未创建本机账户。');

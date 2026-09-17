@@ -54,3 +54,10 @@ export async function 更新用户状态(手机号,禁用){
  if(!是管理员())throw new Error('只有管理员可以管理账户');
  return (await 云端请求('/api/user/status',{method:'PUT',body:JSON.stringify({手机号,禁用:!!禁用})})).user;
 }
+export const 获取管理日志=async(页=0)=>(await 云端请求('/api/admin/logs?page='+页)).logs;
+export const 修改账户密码=(旧密码,新密码,确认密码)=>云端请求('/api/password',{method:'PUT',body:JSON.stringify({旧密码,新密码,确认密码})});
+export const 退出其他设备=()=>云端请求('/api/logout-others',{method:'POST'});
+export async function 注销当前账户(){
+ try{await 云端请求('/api/logout',{method:'POST'});}catch(e){if(e.status!==401)throw e;}
+ 退出登录();
+}
