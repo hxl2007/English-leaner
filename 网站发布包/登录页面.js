@@ -19,6 +19,7 @@ const 元素 = {
 // 切换登录/注册模式
 元素.切换按钮.addEventListener('click', () => {
   当前模式 = 当前模式 === '登录' ? '注册' : '登录';
+  元素.密码.autocomplete=当前模式==='注册'?'new-password':'current-password';
 
   if (当前模式 === '注册') {
     元素.标题.textContent = '注册';

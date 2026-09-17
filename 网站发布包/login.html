@@ -20,7 +20,7 @@
       <form id="认证表单">
         <div class="表单组">
           <label for="手机号">手机号</label>
-          <input type="tel" id="手机号" placeholder="请输入手机号" maxlength="11" required>
+          <input type="tel" id="手机号" placeholder="请输入手机号" maxlength="11" autocomplete="username" inputmode="tel" required>
           <p class="错误提示">请输入正确的手机号码</p>
         </div>
 
@@ -32,13 +32,13 @@
 
         <div class="表单组">
           <label for="密码">密码</label>
-          <input type="password" id="密码" placeholder="请输入密码" required>
+          <input type="password" id="密码" placeholder="请输入密码" maxlength="256" autocomplete="current-password" required>
           <p class="错误提示">密码至少需要6位</p>
         </div>
 
         <div class="表单组" id="确认密码组" style="display:none">
           <label for="确认密码">确认密码</label>
-          <input type="password" id="确认密码" placeholder="请再次输入密码">
+          <input type="password" id="确认密码" placeholder="请再次输入密码" maxlength="256" autocomplete="new-password">
           <div class="密码强度"><div></div></div>
           <p class="错误提示">两次输入的密码不一致</p>
         </div>
