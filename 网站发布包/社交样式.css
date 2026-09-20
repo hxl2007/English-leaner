@@ -1,0 +1,37 @@
+/* 道友：排行榜 / 好友 / 论道 */
+.道友码{font-family:ui-monospace,Consolas,monospace;background:var(--浅绿);color:var(--绿);padding:2px 8px;border-radius:6px;letter-spacing:.5px}
+.道友页签{display:flex;gap:18px;margin:6px 0 18px;border-bottom:1px solid var(--线)}
+.道友页签 a{display:inline-flex;align-items:center;gap:6px;padding:10px 0;color:var(--灰);font-size:14px;border-bottom:2px solid transparent;text-decoration:none}
+.道友页签 a.当前{border-color:var(--绿);color:var(--绿);font-weight:600}
+.小徽标{font-size:11px;padding:1px 7px;margin-left:6px;line-height:1.5}
+.徽标.灰{background:var(--底);color:var(--灰)}
+.道友卡{background:var(--纸);border:1px solid var(--线);border-radius:12px;padding:18px 22px;margin-bottom:18px}
+.道友卡 .分区头{margin-bottom:12px}
+.道友切换{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;width:100%}
+.道友表格 td,.道友表格 th{white-space:nowrap}
+.道友表格 tr.是我 td{background:var(--浅绿)}
+.名次{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-weight:700;color:#fff;background:var(--灰)}
+.名次1{background:#d4a017}.名次2{background:#8c9aa5}.名次3{background:#b87333}
+.道友开关组{display:flex;gap:28px;flex-wrap:wrap;padding:6px 0}
+.道友开关{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:15px}
+.道友开关 input{width:18px;height:18px;accent-color:var(--绿)}
+.道友表单{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.道友表单 input{flex:1 1 240px;min-width:0;padding:10px 12px;border:1px solid var(--线);border-radius:8px;font-size:15px;background:var(--纸);color:var(--墨)}
+.道友表单 [data-form-error]{flex-basis:100%;color:var(--红);margin:0;min-height:1em}
+.道友行{padding:14px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--线)}
+.道友行:last-child{border-bottom:0}
+.道友行 p{margin:0 0 4px;font-weight:600}
+.道友行 small{color:var(--灰)}
+.论道题{background:var(--纸);border:1px solid var(--线);border-radius:12px;padding:22px 24px}
+.论道题 .题干{font-size:18px;line-height:1.7;margin:0 0 18px}
+.论道选项{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.论道选项 .选项{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;padding:12px 14px;border:1px solid var(--线);border-radius:8px;background:var(--纸);color:var(--墨);font-size:16px;line-height:1.5;cursor:pointer}
+.论道选项 .选项:hover{background:var(--浅绿);border-color:var(--绿)}
+.论道选项 .选项.已选{background:var(--浅绿);border-color:var(--绿);box-shadow:inset 0 0 0 1px var(--绿)}
+.论道选项 .选项字母{font-weight:700;color:var(--绿);flex-shrink:0}
+.论道题号{display:flex;flex-wrap:wrap;gap:8px;max-width:none;margin:0 0 16px}
+.论道题号 .题号{flex:0 0 auto;width:42px;min-height:36px;aspect-ratio:auto;font-size:13px}
+.论道题号 .题号.当前{outline:2px solid var(--绿);outline-offset:1px}
+.论道操作{justify-content:flex-end}
+.论道错题{color:var(--红);font-size:14px;line-height:1.7}
+@media (max-width:720px){.论道选项{grid-template-columns:1fr}.道友卡{padding:14px 16px}.道友行{flex-direction:column;align-items:stretch}.道友行 .按钮组{justify-content:flex-end}}
