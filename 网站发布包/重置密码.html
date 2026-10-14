@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>重置密码 - 升本练习室</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 40px 20px; background: #f5f5f5; }
+    .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { color: #2c5f2d; margin-bottom: 20px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; }
+    input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    button { width: 100%; padding: 14px; background: #2c5f2d; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1e4620; }
+    .message { margin-top: 20px; padding: 12px; border-radius: 6px; display: none; }
+    .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .info { background: #e8f4f8; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #2c5f2d; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔑 重置密码</h1>
+
+    <div class="info">
+      <strong>说明：</strong>此工具用于重置本地 IndexedDB 中存储的用户密码。
+    </div>
+
+    <div class="form-group">
+      <label for="phone">手机号</label>
+      <input type="tel" id="phone" value="13671068767" maxlength="11">
+    </div>
+
+    <div class="form-group">
+      <label for="newPassword">新密码</label>
+      <input type="password" id="newPassword" placeholder="输入新密码（至少6位）">
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">确认新密码</label>
+      <input type="password" id="confirmPassword" placeholder="再次输入新密码">
+    </div>
+
+    <button onclick="resetPassword()">重置密码</button>
+
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    // 简单加密函数（与认证.js中的相同）
+    function 简单加密(文本) {
+      let 结果 = 0;
+      for (let i = 0; i < 文本.length; i++) {
+        结果 = ((结果 << 5) - 结果) + 文本.charCodeAt(i);
+        结果 |= 0;
+      }
+      return 结果.toString(36);
+    }
+
+    function showMessage(text, type) {
+      const msg = document.getElementById('message');
+      msg.textContent = text;
+      msg.className = 'message ' + type;
+      msg.style.display = 'block';
+    }
+
+    async function resetPassword() {
+      const phone = document.getElementById('phone').value.trim();
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      // 验证
+      if (!/^1[3-9]\d{9}$/.test(phone)) {
+        showMessage('请输入正确的手机号码', 'error');
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        showMessage('密码至少需要6位', 'error');
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        showMessage('两次输入的密码不一致', 'error');
+        return;
+      }
+
+      try {
+        // 打开数据库
+        const request = indexedDB.open('升本练习室认证', 1);
+
+        request.onerror = () => {
+          showMessage('无法打开数据库', 'error');
+        };
+
+        request.onsuccess = () => {
+          const db = request.result;
+          const transaction = db.transaction(['用户'], 'readwrite');
+          const store = transaction.objectStore('用户');
+
+          // 获取用户
+          const getRequest = store.get(phone);
+
+          getRequest.onsuccess = () => {
+            const user = getRequest.result;
+
+            if (!user) {
+              showMessage(`手机号 ${phone} 未注册`, 'error');
+              return;
+            }
+
+            // 更新密码
+            user.密码 = 简单加密(newPassword);
+            const updateRequest = store.put(user);
+
+            updateRequest.onsuccess = () => {
+              showMessage(`✅ 密码重置成功！手机号：${phone}`, 'success');
+
+              // 清空输入框
+              document.getElementById('newPassword').value = '';
+              document.getElementById('confirmPassword').value = '';
+
+              // 3秒后跳转到登录页
+              setTimeout(() => {
+                window.location.href = './login.html';
+              }, 2000);
+            };
+
+            updateRequest.onerror = () => {
+              showMessage('密码更新失败', 'error');
+            };
+          };
+
+          getRequest.onerror = () => {
+            showMessage('查询用户失败', 'error');
+          };
+        };
+
+      } catch (error) {
+        showMessage('操作失败：' + error.message, 'error');
+      }
+    }
+
+    // 回车提交
+    document.getElementById('confirmPassword').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') resetPassword();
+    });
+  </script>
+</body>
+</html>

@@ -1,4 +1,14 @@
 export const 模块列表 = ['单选', '阅读', '完形', '翻译'];
+export const 英语题量 = {单选:15,阅读:5,完形:1,翻译:5};
+export const 英语整卷满分 = 75;
+export const 练习满分 = c => c.模块==='整卷'?(c.编排版本===3?英语整卷满分:85):100;
+// 文本难度为估算：平均句长、长词占比、篇幅和推断题占比共同参与。
+export function 阅读难度(p,题表) {
+  const 文=p.段落.join(' '),词=文.match(/[a-zA-Z]+(?:['’][a-zA-Z]+)?/g)||[];
+  const 句数=Math.max(1,(文.match(/[.!?]+(?:\s|$)/g)||[]).length);
+  const 推断数=p.题目编号.filter(id=>/推断|主旨|态度|词义/.test(题表.get(id)?.知识点||'')).length;
+  return Math.round((词.length/句数+词.filter(w=>w.length>=8).length/Math.max(1,词.length)*50+词.length/80+推断数/p.题目编号.length*10)*100)/100;
+}
 export const 奖励规则 = {单选:25, 阅读:40, 完形:30, 翻译:25, 整卷:100, 复习:10, 专项:25};
 export {境界商品 as 兑换物品} from './修行商城.js';
 export const 修为等级 = [
@@ -12,7 +22,7 @@ export function 修为信息(金币) {
   return {当前, 下一, 进度:下一?Math.max(0,Math.min(100,(金币-当前.金币)/(下一.金币-当前.金币)*100)):100};
 }
 export function 奖励金币(练习,分数) {
-  const 满分=练习.模块==='整卷'?85:100;
+  const 满分=练习满分(练习);
   if(练习.模块==='复习')return Math.round(分数/100*练习.题目编号.length);
   return Math.max(0,Math.min(奖励规则[练习.模块]||0,Math.round((分数/满分)*(奖励规则[练习.模块]||0))));
 }
@@ -44,9 +54,9 @@ export function 建立题库索引(题库) {
 }
 export function 可抽内容(题库, 题源, 已抽=[]) {
   const 已用=new Set(题源==='原创'?已抽:[]);
-  const 题=题库.题目.filter(q=>q.可抽取!==false&&(q.题源||'原题')===题源&&!已用.has(q.编号));
+  const 题=题库.题目.filter(q=>q.可抽取!==false&&(q.题源||'原题')===题源&&!已用.has(q.编号)&&!已用.has(q.来源题目));
   const 合格题=new Set(题.map(q=>q.编号));
-  const 文=(题库.篇章||[]).filter(p=>p.可抽取!==false&&p.题源===题源&&!已用.has(p.编号)&&p.题目编号.every(id=>合格题.has(id)));
+  const 文=(题库.篇章||[]).filter(p=>p.可抽取!==false&&p.题源===题源&&!已用.has(p.编号)&&!已用.has(p.来源篇章)&&p.题目编号.every(id=>合格题.has(id)));
   return {
     单选:内容去重(题.filter(q=>(q.题型||'单选')==='单选'),q=>q.题干),
     翻译:内容去重(题.filter(q=>q.题型==='翻译'),q=>q.题干),
@@ -56,7 +66,8 @@ export function 可抽内容(题库, 题源, 已抽=[]) {
 }
 export function 检查库存(题库, 题源, 模块, 已抽=[]) {
   if(!['原题','原创'].includes(题源)||![...模块列表,'整卷'].includes(模块))throw new Error('练习类型无效。');
-  const 库存=可抽内容(题库,题源,已抽), 需求={单选:25,阅读:3,完形:1,翻译:5};
+  const 库存=可抽内容(题库,题源,已抽), 需求=英语题量;
+  库存.完形=库存.完形.filter(p=>p.题目编号.length===10);
   const 缺少=(模块==='整卷'?模块列表:[模块]).filter(k=>库存[k].length<需求[k]);
   return {库存, 缺少, 可开始:缺少.length===0};
 }
@@ -68,10 +79,18 @@ export function 生成练习(题库, 题源, 模块, 已抽=[], 随机=随机整
   const 加题=(编号, 类型, 篇章=null)=>{题目编号.push(编号);单元.push({题目:编号,题型:类型,篇章});};
   for(const 类型 of (模块==='整卷'?模块列表:[模块])) {
     if(类型==='单选'||类型==='翻译') {
-      for(const q of 打乱(库存[类型],随机).slice(0,类型==='单选'?25:5))加题(q.编号,类型);
+      for(const q of 打乱(库存[类型],随机).slice(0,英语题量[类型]))加题(q.编号,类型);
     } else {
-      for(const p of 打乱(库存[类型],随机).slice(0,类型==='阅读'?3:1)) {
-        if(类型==='完形'&&p.题目编号.length!==20)throw new Error('完形必须包含完整的 20 个空。');
+      let 选篇=打乱(库存[类型],随机).slice(0,英语题量[类型]);
+      if(类型==='阅读') {
+        const 排序=[...库存.阅读].sort((a,b)=>阅读难度(a,题目表)-阅读难度(b,题目表));
+        选篇=Array.from({length:5},(_,i)=>{
+          const 区间=排序.slice(Math.floor(i*排序.length/5),Math.floor((i+1)*排序.length/5));
+          return 区间[随机(区间.length)];
+        });
+      }
+      for(const p of 选篇) {
+        if(类型==='完形'&&p.题目编号.length!==10)throw new Error('完形必须包含完整的 10 个空。');
         篇章编号.push(p.编号);
         // 阅读题可打乱；完形空号必须保持与正文中的空格一致。
         const 题序=类型==='阅读'?打乱(p.题目编号,随机):p.题目编号;
@@ -84,7 +103,7 @@ export function 生成练习(题库, 题源, 模块, 已抽=[], 随机=随机整
     const q=题目表.get(id), 关联选项=/\b(?:above|below)\b|\b[A-D]\s*(?:and|or|&|,)\s*[A-D]\b/i.test(q.选项.join(' '));
     return [id,关联选项?[0,1,2,3]:打乱([0,1,2,3],随机)];
   }));
-  return {编号:新编号(),版本:2,题源,模块,名称:`${题源==='原创'?'原创模拟':'原题随机'} · ${模块==='整卷'?'全套卷':模块}`,题目编号,篇章编号,单元,选项顺序,本次原创,作答:{},自评:{},标记:[],当前题:0,开始时间:Date.now(),满分:模块==='整卷'?85:100,金币:奖励规则[模块]};
+  return {编号:新编号(),版本:2,编排版本:3,题源,模块,名称:`${题源==='原创'?'原创模拟':'原题随机'} · ${模块==='整卷'?'全套卷':模块}`,题目编号,篇章编号,单元,选项顺序,本次原创,作答:{},自评:{},标记:[],当前题:0,开始时间:Date.now(),满分:模块==='整卷'?英语整卷满分:100,金币:奖励规则[模块]};
 }
 export function 补齐旧练习(记录,题库) {
   if(记录.版本===2)return 记录;
@@ -93,6 +112,11 @@ export function 补齐旧练习(记录,题库) {
 export function 题目分值(练习,索引) {
   const 题=练习.单元[索引];
   if(练习.模块!=='整卷')return 100/练习.题目编号.length;
+  if(练习.编排版本===3) {
+    if(题.题型==='单选'||题.题型==='完形')return 1;
+    if(题.题型==='翻译')return 2;
+    return 8/练习.单元.filter(x=>x.篇章===题.篇章).length;
+  }
   if(题.题型==='单选')return 1;
   if(题.题型==='完形')return 0.5;
   if(题.题型==='翻译')return 4;
@@ -119,7 +143,7 @@ export function 通用评分(练习,答案) {
     } else 比例=答案[q.题目].正确选项.includes(练习.作答[q.题目])?1:0;
     单题得分.push(满分*比例);对错.push(比例===1);
   }
-  const 分数=Math.round(单题得分.reduce((n,x)=>n+x,0)*100)/100,满分=练习.模块==='整卷'?85:100;
+  const 分数=Math.round(单题得分.reduce((n,x)=>n+x,0)*100)/100,满分=练习满分(练习);
   return {分数,满分,金币:['复习','专项'].includes(练习.模块)?对错.filter(Boolean).length:奖励金币(练习,分数),修为:['复习','专项'].includes(练习.模块)?对错.filter(Boolean).length:奖励金币(练习,分数),单题得分,对错,含自评:练习.单元.some(q=>q.题型==='翻译')};
 }
 export function 验证练习(练习,题库) {
@@ -142,8 +166,10 @@ export function 验证练习(练习,题库) {
   const 完形数=[...篇章.keys()].filter(id=>索引.篇章.get(id)?.题型==='完形').length;
   if(!部分)for(const [id,题] of 篇章){const p=索引.篇章.get(id);if(!p||p.题目编号.length!==题.size||!p.题目编号.every(q=>题.has(q)))throw new Error('存档文章或小题不完整。');}
   if(!Array.isArray(c.篇章编号)||c.篇章编号.length!==篇章.size||new Set(c.篇章编号).size!==篇章.size||!c.篇章编号.every(id=>篇章.has(id)))throw new Error('存档篇章目录无效。');
-  const 需求=c.模块==='整卷'?{单选:25,阅读:3,完形:1,翻译:5}:{单选:0,阅读:0,完形:0,翻译:0,[c.模块]:{单选:25,阅读:3,完形:1,翻译:5}[c.模块]};
-  if(!部分&&(数.单选!==需求.单选||数.翻译!==需求.翻译||阅读数!==需求.阅读||完形数!==需求.完形||数.完形!==需求.完形*20))throw new Error('存档题量不符合组卷规则。');
+  if(c.编排版本!==undefined&&c.编排版本!==3)throw new Error('存档编排版本无效。');
+  const 规则=c.编排版本===3?英语题量:{单选:25,阅读:3,完形:1,翻译:5};
+  const 需求=c.模块==='整卷'?规则:{单选:0,阅读:0,完形:0,翻译:0,[c.模块]:规则[c.模块]};
+  if(!部分&&(数.单选!==需求.单选||数.翻译!==需求.翻译||阅读数!==需求.阅读||完形数!==需求.完形||数.完形!==需求.完形*(c.编排版本===3?10:20)))throw new Error('存档题量不符合组卷规则。');
   if(复习&&(!/^\d{4}-\d{2}-\d{2}$/.test(c.复习日期||'')||c.编号!==`daily-${c.复习日期}`||c.题目编号.length<1||c.题目编号.length>10))throw new Error('每日复习记录无效。');
   if(专项&&(!['单选','阅读'].includes(c.专项类型)||!c.题目编号.length||c.题目编号.some(id=>{const q=索引.题目.get(id);return q.题型!==c.专项类型||q.知识点!==c.知识点;})||c.专项类型==='单选'&&c.题目编号.length>25||c.专项类型==='阅读'&&(阅读数<1||阅读数>3)))throw new Error('专项题目或知识点不匹配。');
   if(c.考试&&(c.模块!=='整卷'||!Number.isFinite(c.考试截止)||c.考试截止-c.开始时间!==70*60000||c.交卷时间!==undefined&&(!Number.isFinite(c.交卷时间)||c.交卷时间<c.开始时间)))throw new Error('考试计时记录无效。');

@@ -4,22 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#18745e">
-  <meta name="description" content="专升本英语练习：500道原创单选、照片原题、随机模拟、错题解析与金币修为。">
-  <title>升本练习室 · 专升本英语</title>
+  <meta name="description" content="北京专升本学习空间：英语、高等数学和C语言在线答题。">
+  <title>升本练习室 · 科目首页</title>
   <link rel="icon" href="./学习图标.png" type="image/png">
-  <link rel="stylesheet" href="./样式.css">
-  <link rel="stylesheet" href="./升级样式.css">
-  <link rel="stylesheet" href="./主题样式.css">
-  <link rel="stylesheet" href="./学习样式.css">
-  <link rel="stylesheet" href="./修行样式.css">
-  <link rel="stylesheet" href="./社交样式.css">
-  <script defer src="./图标.js"></script>
-  <script type="module" src="./练习室.js"></script>
+  <link rel="stylesheet" href="./科目首页.css">
+  <script type="module" src="./科目首页.js"></script>
 </head>
 <body>
-  <div id="应用"><div class="加载">正在打开练习室…</div></div>
-  <div id="提示" role="status" aria-live="polite"></div>
-  <dialog id="对话框"></dialog>
-  <noscript>请启用浏览器的 JavaScript 后使用练习室。</noscript>
+  <a class="跳过导航" href="#主内容">跳到主要内容</a>
+  <header class="首页顶栏"><a class="首页标识" href="./index.html"><img src="./学习图标.png" alt=""><span>升本练习室<small>北京专升本 · 学习空间</small></span></a><nav aria-label="首页导航"><a href="#科目">选择科目</a><a href="./英语.html#记录">学习记录</a><a href="./login.html">我的账户</a></nav></header>
+  <main id="主内容" class="首页内容">
+    <section class="首页欢迎"><div><p class="首页眉题">把积累，变成下一步。</p><h1>今天，从哪一科开始？</h1><p>一个学习空间，三门升本课程。<br>选择科目，继续你的备考进度。</p><a class="首页按钮" href="./英语.html">开始英语练习 <span aria-hidden="true">↗</span></a></div><aside class="学习札记"><span>今日学习札记</span><h2>日积一题，<br>学有所成。</h2><p>练习 · 理解 · 巩固</p><div class="札记刻度" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></div></aside></section>
+    <section id="科目" aria-labelledby="科目标题"><div class="首页分区头"><div><p class="首页眉题">你的备考课程</p><h2 id="科目标题">选择学习科目</h2></div><span>按自己的节奏，逐科积累</span></div>
+      <div class="科目网格">
+        <a class="科目卡 英语卡" href="./英语.html"><div class="科目标记"><span>01 / 语言</span><span class="科目状态">在线练习</span></div><div class="科目符号" aria-hidden="true">Aa</div><h3>英语</h3><p>单项选择、阅读、完形与翻译<br>原题练习与原创模拟</p><div class="科目卡底">进入练习室 <span aria-hidden="true">↗</span></div></a>
+        <a class="科目卡 数学卡" href="./科目资料.html?科目=高等数学"><div class="科目标记"><span>02 / 数理</span><span class="科目状态">在线题库</span></div><div class="科目符号" aria-hidden="true">∫</div><h3>高等数学</h3><p>联大数学照片题与分级练习<br>按知识点、难度逐题训练</p><div class="科目卡底">进入数学题库 <span aria-hidden="true">↗</span></div></a>
+        <a class="科目卡 程序卡" href="./科目资料.html?科目=C语言"><div class="科目标记"><span>03 / 程序设计</span><span class="科目状态">在线题库</span></div><div class="科目符号" aria-hidden="true">{ C }</div><h3>C 语言</h3><p>程序设计基础<br>院校官方样题与教材例题练习</p><div class="科目卡底">进入程序设计题库 <span aria-hidden="true">↗</span></div></a>
+      </div>
+    </section>
+    <section class="英语编排" aria-labelledby="编排标题"><div class="首页分区头"><div><p class="首页眉题">英语整卷 · 新编排</p><h2 id="编排标题">先巩固基础，再挑战阅读。</h2></div><span>总分 75 分 · 不含作文</span></div><ol class="编排序列"><li><b>01</b><h3>单项选择</h3><p>15 道题</p><strong>15 分</strong></li><li><b>02</b><h3>阅读理解</h3><p>5 篇 · 由易到难</p><strong>40 分</strong></li><li><b>03</b><h3>完形填空</h3><p>1 篇 · 10 个单选空</p><strong>10 分</strong></li><li><b>04</b><h3>句子翻译</h3><p>5 句 · 对照要点自评</p><strong>10 分</strong></li></ol><p class="首页说明">阅读难度根据句长、词汇和题目类型估算。单块练习独立按 100 分计分，旧练习保留原有分值。</p><a class="首页文字链接" href="./英语.html#全套卷子模拟题">进入英语模拟考场 <span aria-hidden="true">→</span></a></section>
+    <section class="资料说明"><div><h2>高等数学：整卷开练 + 考点刷题。</h2><p>可按院校年份打开整套原卷/照片卷；主观题支持上传答题截图，用 ChatGPT 网页辅助判分。另有四级难度与单知识点刷题；同型练习单独标明。</p></div><a class="首页文字链接" href="./科目资料.html?科目=高等数学">进入数学整卷练习 →</a></section>
+  </main><footer class="首页页脚">升本练习室 · 专注每一道题</footer>
+  <noscript>可直接使用上方科目链接进入英语练习或科目资料页。</noscript>
 </body>
 </html>

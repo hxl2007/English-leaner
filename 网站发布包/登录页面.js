@@ -111,7 +111,9 @@ const 元素 = {
 
     // 1秒后跳转到主页
     setTimeout(() => {
-      window.location.href = './index.html';
+      const 目标 = sessionStorage.getItem('登录后科目');
+      sessionStorage.removeItem('登录后科目');
+      window.location.href = 目标?.startsWith('./英语.html') ? 目标 : './index.html';
     }, 1000);
 
   } catch (错误) {
@@ -163,7 +165,9 @@ function 显示成功(消息) {
     if (是否已登录() && !来自主页) {
       // 清除标记
       sessionStorage.removeItem('刚从主页跳转');
-      window.location.href = './index.html';
+      const 目标 = sessionStorage.getItem('登录后科目');
+      sessionStorage.removeItem('登录后科目');
+      window.location.href = 目标?.startsWith('./英语.html') ? 目标 : './index.html';
     } else if (来自主页) {
       // 清除标记，允许用户重新登录
       sessionStorage.removeItem('刚从主页跳转');

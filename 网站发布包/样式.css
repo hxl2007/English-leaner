@@ -5,3 +5,59 @@
 @media(max-width:900px){.侧栏{width:76px;padding:24px 10px}.标识{padding:0 10px 30px}.标识 div,.导航标题,.导航 a span,.侧栏底部,.导航 a.选中:after{display:none}.导航{gap:12px}.导航 a{padding:15px 16px}.主区{margin-left:76px}.练习布局{grid-template-columns:minmax(0,1fr)}.首页侧{display:none}.题干{font-size:19px}.分类网格{gap:12px}.指标{padding:0 16px}}
 @media(max-width:680px){.侧栏{display:none}.主区{margin-left:0}.顶栏{height:62px;padding:0 20px}.面包屑{font-size:12px;gap:7px}.面包屑>span{display:none}.顶栏右{gap:12px}.内容{padding:25px 18px 100px}.页头{margin-bottom:24px}.页头 h1{font-size:25px}.页头 .日期{display:none}.副标题{font-size:12px}.概况{grid-template-columns:repeat(2,1fr);row-gap:22px;padding:20px 0;margin-bottom:28px}.指标{padding:0 18px}.指标:nth-child(2){border-right:0}.指标:nth-child(3){padding-left:0}.指标值{font-size:26px;margin-top:8px}.分类网格{grid-template-columns:repeat(2,1fr);gap:12px}.分类项{min-height:160px;padding:18px}.分类图标{width:36px;height:36px;margin-bottom:15px}.分类项 h3{font-size:15px}.分区头{margin:26px 0 15px}.分区头 h2{font-size:18px}.表格{min-width:0}.表格 th,.表格 td{padding:14px 7px}.表格 th:first-child,.表格 td:first-child{padding-left:8px}.表格 .手机隐藏{display:none}.序列{display:none}.按钮{padding:10px 13px;font-size:12px;min-height:42px}.套题列表{grid-template-columns:1fr}.套题项{padding:20px}.套题来源{min-height:0}.套题信息{padding:14px 0}.工具栏{align-items:flex-start}.搜索{width:100%}.搜索 input{width:100%}.分段{gap:23px}.答题布局{display:flex;flex-direction:column}.试题{padding:22px 18px;width:100%}.答题卡{position:static;width:100%;padding:20px}.题号网格{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;max-width:320px;margin:20px auto}.题号{aspect-ratio:1.3}.题干{font-size:19px;line-height:1.7}.题目头{padding-bottom:17px}.选项{font-size:17px;min-height:60px;padding:13px 12px;gap:12px}.选项 small{font-size:10px}.题目操作{gap:7px;padding-top:20px;margin-top:24px}.练习头 h1{font-size:21px}.计时{font-size:12px}.成绩条{gap:18px;padding-bottom:20px}.成绩数字{font-size:39px}.成绩奖励{margin-left:0;padding:10px 13px;width:100%;justify-content:center}.手机导航{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fffffff5;backdrop-filter:blur(10px);border-top:1px solid var(--线);justify-content:space-around;padding:8px 5px max(9px,env(safe-area-inset-bottom));z-index:30}.手机导航 a{display:flex;align-items:center;flex-direction:column;gap:4px;color:#8a978e;font-size:10px;min-width:48px;padding:3px}.手机导航 a.选中{color:var(--绿)}.手机导航 svg{width:21px;height:21px}#提示{bottom:85px;width:max-content}.设置行{align-items:flex-start;flex-direction:column;gap:14px}.设置行 .按钮组{width:100%}.空状态{padding:70px 15px}.头像{display:none}.金币{font-size:12px;padding:7px 9px}.文末{line-height:1.8}.继续条{padding:14px;align-items:flex-start}.继续条 .按钮{min-width:88px}.分区头 .按钮.轻{font-size:12px}.答案对照{gap:12px}.题目头>span{max-width:70%;line-height:1.6}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ===== 书院晨境 · 视觉升级层（2026-09-20 / frontend-design：一处张扬、其余克制；reduced-motion 全降级） ===== */
+@keyframes 入境{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes 顶入{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:none}}
+@keyframes 落定{0%{transform:scale(.97)}55%{transform:scale(1.012)}100%{transform:scale(1)}}
+@keyframes 答对光晕{0%{box-shadow:0 0 0 0 rgba(64,168,112,.5)}100%{box-shadow:0 0 0 16px rgba(64,168,112,0)}}
+@keyframes 摇摇头{25%{transform:translateX(-4px)}50%{transform:translateX(3px)}75%{transform:translateX(-2px)}100%{transform:none}}
+@keyframes 金币流光{0%,70%{transform:translateX(-130%)}92%,100%{transform:translateX(130%)}}
+@keyframes 晨雾{0%,100%{transform:translate3d(-1.6%,0,0)}50%{transform:translate3d(1.6%,0,0)}}
+@keyframes 幕入{from{opacity:0}to{opacity:1}}
+/* 开场入境：单页应用每次换页播一遍，仅首屏分区依次落定 */
+.内容>*{animation:入境 .5s cubic-bezier(.22,.9,.3,1) both}
+.内容>*:nth-child(2){animation-delay:.06s}.内容>*:nth-child(3){animation-delay:.12s}.内容>*:nth-child(4){animation-delay:.18s}.内容>*:nth-child(n+5){animation-delay:.24s}
+.壳 .顶栏{animation:顶入 .45s cubic-bezier(.22,.9,.3,1) both}
+.导航 a{animation:入境 .45s cubic-bezier(.22,.9,.3,1) both}
+.导航 a:nth-child(2){animation-delay:.04s}.导航 a:nth-child(3){animation-delay:.08s}.导航 a:nth-child(4){animation-delay:.12s}.导航 a:nth-child(5){animation-delay:.16s}.导航 a:nth-child(6){animation-delay:.2s}.导航 a:nth-child(7){animation-delay:.24s}.导航 a:nth-child(8){animation-delay:.28s}.导航 a:nth-child(n+9){animation-delay:.32s}
+/* 质感：分层发丝阴影；只有可点卡片才浮起，内容面保持安静 */
+.分类项,.试题,.答题卡,.套题项{box-shadow:0 1px 2px rgba(20,46,38,.05),0 12px 30px -20px rgba(20,46,38,.3)}
+.分类项,.套题项{transition:transform .22s cubic-bezier(.22,.9,.3,1),box-shadow .22s,border-color .18s}
+.分类项:hover{transform:translateY(-4px);box-shadow:0 2px 4px rgba(20,46,38,.05),0 20px 44px -18px rgba(23,77,67,.32)}
+.分类箭头{transition:transform .2s,color .2s}
+.分类项:hover .分类箭头{transform:translate(3px,-3px);color:var(--绿)}
+.套题项:hover{transform:translateY(-2px)}
+.壳 .顶栏{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:color-mix(in srgb,var(--纸,#fff) 85%,transparent)}
+/* 金币：每 6 秒一道流光，全局唯一常驻动效 */
+.金币{position:relative;overflow:hidden;transition:transform .18s}
+.金币:hover{transform:translateY(-1px)}
+.金币::after{content:"";position:absolute;inset:-45% -140%;background:linear-gradient(105deg,transparent 44%,rgba(255,255,255,.7) 50%,transparent 56%);transform:translateX(-130%);animation:金币流光 6s ease-in-out infinite;pointer-events:none}
+/* 答题反馈：动效只表达状态变化 */
+.选项{transition:border-color .15s,background .15s,transform .15s}
+.选项.已选{animation:落定 .3s cubic-bezier(.3,1.35,.4,1)}
+.选项.正确{animation:落定 .3s cubic-bezier(.3,1.35,.4,1),答对光晕 .8s ease-out .1s}
+.选项.错误{animation:摇摇头 .32s ease-in-out}
+.题号.正确,.题号.错误{animation:落定 .28s cubic-bezier(.3,1.35,.4,1)}
+.按钮{transition:transform .15s,box-shadow .2s,background .16s,border-color .16s}.按钮:not(.次要):not(.轻){box-shadow:0 1px 2px rgba(20,46,38,.1)}
+.按钮:not(.次要):not(.轻):hover{transform:translateY(-1px);box-shadow:0 8px 18px -8px rgba(23,77,67,.5)}
+.按钮:active{transform:translateY(0) scale(.97)}
+.表格 tbody tr{transition:background .15s}
+.表格 tbody tr:hover{background:color-mix(in srgb,var(--浅绿) 45%,transparent)}
+dialog[open]{animation:入境 .28s cubic-bezier(.22,.9,.3,1)}
+dialog::backdrop{animation:幕入 .25s ease-out}
+/* 主页晨境：.学习欢迎 是首页唯一的"张扬"位——晨雾山影 + 金色晨曦，缓慢漂移（保留基底不对称圆角与排版） */
+.学习欢迎{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(150deg,color-mix(in srgb,var(--浅绿) 78%,var(--纸)) 0%,var(--纸) 55%,color-mix(in srgb,var(--浅绿) 42%,var(--纸)) 100%)}
+.学习欢迎::before{content:"";position:absolute;z-index:0;right:-6%;top:-75%;width:400px;height:400px;border-radius:50%;background:radial-gradient(closest-side,rgba(240,196,92,.4),rgba(240,196,92,0) 72%);animation:晨雾 9s ease-in-out infinite;pointer-events:none}
+.学习欢迎::after{content:"";position:absolute;z-index:0;left:-8%;bottom:-150%;width:130%;height:220%;background:radial-gradient(50% 60% at 28% 62%,color-mix(in srgb,var(--绿) 15%,transparent),transparent 70%),radial-gradient(46% 56% at 74% 58%,color-mix(in srgb,var(--绿) 10%,transparent),transparent 70%);animation:晨雾 14s ease-in-out infinite reverse;pointer-events:none}
+.学习欢迎>*{position:relative;z-index:1}
+.学习欢迎 h1{letter-spacing:.06em}
+.首页问候{letter-spacing:.02em}
+.欢迎书签{box-shadow:0 12px 30px -14px rgba(23,77,67,.55)}
+:root[data-主题="夜间"] .学习欢迎::before{background:radial-gradient(closest-side,rgba(240,196,92,.22),rgba(240,196,92,0) 72%)}
+/* 细节：细滚动条、选中文本色、夜间阴影压低 */
+*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--绿) 35%,transparent) transparent}
+::selection{background:color-mix(in srgb,var(--绿) 16%,transparent)}
+:root[data-主题="夜间"] .分类项,:root[data-主题="夜间"] .试题,:root[data-主题="夜间"] .答题卡,:root[data-主题="夜间"] .套题项{box-shadow:0 1px 2px rgba(0,0,0,.35),0 14px 30px -20px rgba(0,0,0,.6)}
+/* 系统级减少动态偏好：全部动效降级 */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
