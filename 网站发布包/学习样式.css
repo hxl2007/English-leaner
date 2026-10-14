@@ -29,3 +29,10 @@ body{color:var(--墨);background:var(--底)}
 .学习欢迎{margin-bottom:32px}
 .分类列表,.套题列表{gap:20px}
 @media(max-width:680px){.学习欢迎{margin-bottom:20px}.分类列表,.套题列表{gap:14px}}
+
+/* ===== polish 卡片层级 2026-10-15 ===== */
+.分类项,.套题项{transition:transform .2s cubic-bezier(.22,.9,.3,1),box-shadow .2s,border-color .18s}
+.分类项:hover,.套题项:hover{transform:translateY(-3px)}
+@media(prefers-reduced-motion:reduce){.分类项:hover,.套题项:hover{transform:none}}
+.管理员面板{border-radius:12px}
+.设置行{padding:var(--space-5,24px) 0;gap:var(--space-5,24px)}

@@ -36,3 +36,10 @@
 .专业课试题{padding:28px 30px}
 @media(max-width:800px){.答题布局{gap:16px}.答题导航{border-radius:10px}.专业课试题{border-radius:10px;padding:20px 18px}}
 @media(max-width:600px){.ai判题区{padding:14px}.ai预览 img{max-height:180px}.ai判分按钮{width:100%}.试卷卡{border-radius:10px}}
+
+/* ===== arrange 专业课 2026-10-15 ===== */
+.试卷卡+.试卷卡,.资料清单>.试卷卡{margin-top:0}
+.答题页眉{padding-top:var(--space-4,16px);margin-bottom:var(--space-2,8px)}
+.题目翻页{margin-top:var(--space-6,32px);padding-top:var(--space-5,24px);gap:var(--space-3,12px)}
+.我的作答,.参考解析{margin:var(--space-5,24px) 0;border-radius:10px}
+@media(max-width:600px){.题目翻页 .练习按钮,.题目翻页 .次按钮{flex:1;justify-content:center}}

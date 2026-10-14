@@ -36,3 +36,10 @@
 .套题列表{gap:20px}
 .内容{max-width:1360px}
 @media(max-width:680px){.ai英语辅助{padding:10px 12px}.ai英语辅助 .ai判分按钮{flex:1;justify-content:center}}
+
+/* ===== arrange 升级层留白 2026-10-15 ===== */
+.首页问候{margin:-4px 0 var(--space-5,24px);gap:var(--space-2,8px)}
+.管理员面板{margin:var(--space-6,32px) 0;padding:var(--space-2,8px) 0 var(--space-5,24px)}
+.ai英语辅助{border-radius:12px;padding:var(--space-4,16px);margin-top:var(--space-3,12px)}
+.ai英语辅助 .ai动作行{gap:var(--space-2,8px)}
+@media(max-width:680px){.内容{max-width:100%}.ai英语辅助 .ai判分按钮{min-height:44px}}

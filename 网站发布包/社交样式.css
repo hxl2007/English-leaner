@@ -35,3 +35,8 @@
 .论道操作{justify-content:flex-end}
 .论道错题{color:var(--红);font-size:14px;line-height:1.7}
 @media (max-width:720px){.论道选项{grid-template-columns:1fr}.道友卡{padding:14px 16px}.道友行{flex-direction:column;align-items:stretch}.道友行 .按钮组{justify-content:flex-end}}
+
+/* ===== arrange 社交 2026-10-15 ===== */
+.道友卡{box-shadow:0 1px 2px rgba(20,46,38,.05)}
+.论道选项 .选项{min-height:48px;border-radius:8px}
+@media(max-width:720px){.道友页签{gap:14px;overflow-x:auto}.道友页签 a{white-space:nowrap;min-height:44px}}

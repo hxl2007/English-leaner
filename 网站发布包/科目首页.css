@@ -2,3 +2,16 @@
 @media(max-width:800px){.首页欢迎{gap:30px;padding:42px 0}.学习札记{padding:24px}.学习札记 h2{font-size:25px}.科目网格{gap:12px}.科目卡{padding:20px}.科目标记{flex-direction:column;align-items:start}.资料说明{align-items:start;flex-direction:column}.首页分区头>span{display:none}.编排序列 li{padding:18px}}
 @media(max-width:600px){.首页顶栏,.首页内容,.首页页脚{padding-left:20px;padding-right:20px}.首页顶栏{height:auto;min-height:84px;flex-wrap:wrap;padding-top:16px;padding-bottom:12px;gap:10px}.首页顶栏 nav{gap:20px}.首页标识{font-size:18px}.首页欢迎{grid-template-columns:1fr;gap:24px;padding:34px 0}.学习札记{display:none}.科目网格{grid-template-columns:1fr}.科目标记{flex-direction:row;align-items:center}.科目卡{position:relative;padding:24px}.科目符号{position:absolute;right:25px;top:50px;margin:14px 0}.科目卡 h3{margin-top:22px}.科目卡 p{max-width:75%}.编排序列{grid-template-columns:1fr 1fr}.编排序列 li{border-bottom:1px solid var(--边线)}.编排序列 li:nth-child(2){border-right:0}.编排序列 li:nth-child(3){border-bottom:0}.英语编排{padding:36px 0}.首页分区头 h2{font-size:22px}.资料条目 header{flex-direction:column;gap:8px}.资料筛选 label{width:100%}.资料筛选 input{width:100%}.资料页标题 h1{font-size:30px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.科目卡,.首页按钮{transition:none}.科目卡:hover{transform:none}.学习札记{transform:none}}
+
+/* ===== arrange 节奏微调 2026-10-15 ===== */
+.首页内容{padding-bottom:clamp(2rem,4vw,3rem)}
+.首页欢迎 h1{letter-spacing:-.02em;max-width:16ch}
+.首页分区头 h2{letter-spacing:-.01em}
+.科目卡{transition:transform .18s cubic-bezier(.22,.9,.3,1),box-shadow .18s,border-color .18s}
+.编排序列 li+li{border-left:0}
+.资料条目{box-shadow:0 1px 2px rgba(20,46,38,.05)}
+.资料筛选{gap:var(--space-4,16px);margin:var(--space-5,24px) 0}
+@media(max-width:600px){
+  .首页欢迎 h1{max-width:none;font-size:clamp(1.75rem,7vw,2.25rem)}
+  .科目符号{opacity:.35}
+}
