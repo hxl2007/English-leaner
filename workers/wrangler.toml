@@ -1,0 +1,14 @@
+name = "zhuanshengben-api"
+main = "api.js"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "zhuanshengben_users"
+database_id = "b6b6bc99-86cb-4d27-a1c2-85d178efdb60"
+
+[vars]
+ENVIRONMENT = "production"
+
+[ai]
+binding = "AI"
