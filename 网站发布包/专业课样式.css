@@ -43,3 +43,202 @@
 .题目翻页{margin-top:var(--space-6,32px);padding-top:var(--space-5,24px);gap:var(--space-3,12px)}
 .我的作答,.参考解析{margin:var(--space-5,24px) 0;border-radius:10px}
 @media(max-width:600px){.题目翻页 .练习按钮,.题目翻页 .次按钮{flex:1;justify-content:center}}
+
+/* ===== layout-polish merged ===== */
+/* ===== 布局抛光层 2026-10-15 =====
+   依据：impeccable arrange/polish、refactoring-ui spacing、
+   responsive-ui-qa、tokyn anti-slop。保留青绿书院品牌，只调节奏与层级。 */
+
+:root{
+  /* 间距尺度：4→8→12→16→24→32→48→64（≥25% 跳变） */
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;
+  --space-5:24px;--space-6:32px;--space-7:48px;--space-8:64px;
+  /* 阴影尺度：克制、语义化 */
+  --shadow-sm:0 1px 2px rgba(20,46,38,.06);
+  --shadow-md:0 4px 14px -6px rgba(20,46,38,.14);
+  --shadow-lg:0 12px 28px -14px rgba(20,46,38,.22);
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;
+  --content-pad:clamp(1.25rem,2.5vw,2.5rem);
+  --section-gap:clamp(1.5rem,3vw,2.5rem);
+}
+
+/* —— 全局节奏：组内紧、组间疏 —— */
+.内容{padding-top:clamp(1.5rem,3vw,2.25rem);padding-bottom:clamp(2.5rem,5vw,3.75rem)}
+.页头{margin-bottom:var(--space-6);gap:var(--space-5)}
+.分区头{margin:var(--space-6) 0 var(--space-4)}
+.概况{margin-bottom:var(--space-7);padding:var(--space-5) 0}
+.分类网格,.套题列表{gap:var(--space-5)}
+.分类项,.套题项,.试题,.答题卡,.道友卡,.境界商品,.专项卡,.学习报告,.反馈卡{
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+}
+.分类项:hover,.套题项:hover,.科目卡:hover{
+  box-shadow:var(--shadow-md);
+}
+.试题{padding:clamp(1.25rem,2.5vw,2rem)}
+.答题布局{gap:var(--space-6)}
+.题目操作{margin-top:var(--space-6);padding-top:var(--space-5);gap:var(--space-3)}
+.选项组{gap:var(--space-3)}
+.选项{border-radius:var(--radius-sm);min-height:48px}
+.按钮{border-radius:var(--radius-sm);min-height:44px}
+.按钮.次要{box-shadow:none}
+.按钮.轻{box-shadow:none}
+.继续条{margin-bottom:var(--space-6);border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+
+/* 首页欢迎：加强组间留白，正文可读宽度 */
+.学习欢迎{
+  gap:var(--space-6);
+  padding:clamp(1.5rem,3vw,2.25rem) clamp(1.5rem,3.5vw,2.4rem);
+  margin-bottom:var(--space-7);
+  border-radius:var(--radius-lg) var(--radius-lg) 3rem var(--radius-lg);
+}
+.学习欢迎 p:not(.首页问候){max-width:62ch;line-height:1.75}
+.模拟入口{gap:var(--space-6);margin-top:var(--space-2)}
+.成长横栏{margin-top:var(--space-6);padding:var(--space-6) 0;gap:var(--space-5)}
+
+/* 科目首页（index / 科目资料） */
+.首页顶栏{height:auto;min-height:88px;padding-top:var(--space-4);padding-bottom:var(--space-4)}
+.首页欢迎{gap:clamp(2rem,5vw,3.75rem);padding:clamp(2.5rem,6vw,4rem) 0}
+.首页欢迎 p:not(.首页眉题){max-width:42ch;line-height:1.75;font-size:1.05rem}
+.首页分区头{margin-bottom:var(--space-5);align-items:flex-end}
+.科目网格{gap:var(--space-5)}
+.科目卡{
+  padding:var(--space-5) var(--space-5) var(--space-4);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+  display:flex;flex-direction:column;min-height:100%;
+}
+.科目卡 p{flex:1;margin-bottom:var(--space-5)}
+.科目卡底{padding-top:var(--space-4);margin-top:auto}
+.科目符号{margin:var(--space-5) 0 var(--space-4)}
+.编排序列{border-radius:var(--radius-md);box-shadow:var(--shadow-sm);overflow:hidden}
+.编排序列 li{padding:var(--space-5)}
+.英语编排{padding:var(--space-7) 0}
+.资料说明{
+  gap:var(--space-5);
+  padding:var(--space-6) 0;
+  margin-top:var(--space-4);
+}
+.学习札记{
+  padding:var(--space-5) var(--space-6);
+  border-radius:var(--radius-sm) 2.5rem var(--radius-sm) var(--radius-sm);
+  box-shadow:var(--shadow-md);
+}
+.首页按钮{border-radius:var(--radius-sm);min-height:48px;padding:12px 22px;gap:var(--space-4)}
+.首页页脚{padding-top:var(--space-6);padding-bottom:var(--space-7);letter-spacing:.02em}
+
+/* 专业课 / AI 判分区：分组更清晰 */
+.试卷卡,.专业课试题,.数学专项,.答题导航{
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+}
+.资料页标题{padding:var(--space-6) 0 var(--space-5)}
+.资料页标题 p{max-width:68ch;line-height:1.75}
+.试卷卡{padding:var(--space-5) var(--space-6);margin-bottom:0}
+.试卷动作{gap:var(--space-4);margin-top:var(--space-5)}
+.专业课试题{padding:clamp(1.25rem,2.5vw,1.875rem)}
+.专业课选项{gap:var(--space-3)}
+.专业课选项行{border-radius:var(--radius-sm);min-height:52px;padding:14px 16px}
+.ai判题区{
+  margin:var(--space-5) 0;
+  padding:var(--space-4) var(--space-5);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+}
+.ai截图行,.ai动作行{gap:var(--space-2);margin:var(--space-3) 0}
+.ai判分按钮,.练习按钮,.次按钮{min-height:44px;border-radius:var(--radius-sm)}
+.成绩卡{border-radius:var(--radius-md);padding:var(--space-5) var(--space-6);gap:var(--space-5)}
+.资料清单{gap:var(--space-4)}
+.数学专项{padding:var(--space-5) var(--space-6);margin:var(--space-5) 0 var(--space-6)}
+.数学筛选{gap:var(--space-4);margin:var(--space-5) 0 var(--space-3)}
+.知识点网格{gap:var(--space-3)}
+
+/* 修行 / 商城 */
+.每日任务{margin:var(--space-5) 0 var(--space-6);padding:var(--space-5) var(--space-6);gap:var(--space-5)}
+.商城账本{gap:var(--space-5);padding:var(--space-5) 0;margin-bottom:var(--space-6)}
+.境界商品网格,.专项网格{gap:var(--space-4)}
+.境界商品,.专项卡{padding:var(--space-5)}
+.学习报告{padding:var(--space-5);margin:var(--space-5) 0 var(--space-6)}
+.报告指标{gap:var(--space-4);margin:var(--space-5) 0}
+
+/* 登录 */
+.登录卡{
+  border-radius:var(--radius-lg) var(--radius-lg) 3rem var(--radius-lg);
+  box-shadow:var(--shadow-lg);
+  padding:clamp(2rem,4vw,2.75rem);
+  max-width:440px;
+}
+.登录卡 .副标题{margin-bottom:var(--space-6);line-height:1.65}
+.表单组{margin-bottom:var(--space-5)}
+.表单组 label{margin-bottom:var(--space-2)}
+.表单组 input{min-height:48px;border-radius:var(--radius-sm);padding:12px 14px}
+.提交按钮{min-height:48px;border-radius:var(--radius-sm);margin-top:var(--space-3)}
+.切换提示{margin-top:var(--space-6)}
+
+/* 社交 */
+.道友卡{padding:var(--space-4) var(--space-5);margin-bottom:var(--space-4)}
+.道友页签{gap:var(--space-5);margin-bottom:var(--space-4)}
+.论道题{padding:var(--space-5);border-radius:var(--radius-md)}
+.论道选项{gap:var(--space-3)}
+
+/* 阅读答题窗：触控与安全区 */
+.含阅读 .阅读答题窗{
+  padding:12px clamp(12px,3vw,30px) max(12px,env(safe-area-inset-bottom));
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow:0 -8px 28px rgba(23,77,67,.12);
+}
+.阅读答题窗 .选项{min-height:46px}
+.文章正文{max-width:72ch;line-height:1.9}
+
+/* 顶栏 / 侧栏微调 */
+.顶栏{height:68px;padding-left:clamp(1rem,2.5vw,2.5rem);padding-right:clamp(1rem,2.5vw,2.5rem)}
+.导航{gap:var(--space-1)}
+.导航 a{border-radius:var(--radius-sm);min-height:44px}
+
+/* —— 响应式：responsive-ui-qa —— */
+@media(max-width:1150px){
+  .分类网格,.套题列表{gap:var(--space-4)}
+  .答题布局{gap:var(--space-4)}
+}
+@media(max-width:900px){
+  .学习欢迎{gap:var(--space-5)}
+  .科目网格{gap:var(--space-4)}
+}
+@media(max-width:680px){
+  .内容{padding-left:var(--space-4);padding-right:var(--space-4);padding-bottom:6.5rem}
+  .页头{margin-bottom:var(--space-5)}
+  .概况{margin-bottom:var(--space-5);padding:var(--space-4) 0}
+  .分类网格,.套题列表,.科目网格{gap:var(--space-3)}
+  .分类项,.套题项,.试题,.科目卡{padding:var(--space-4)}
+  .学习欢迎{margin-bottom:var(--space-5);padding:var(--space-5) var(--space-4);border-radius:var(--radius-md) var(--radius-md) 2.5rem var(--radius-md)}
+  .选项,.专业课选项行,.按钮,.练习按钮,.次按钮,.ai判分按钮{min-height:44px}
+  .手机导航 a{min-width:48px;min-height:48px;justify-content:center}
+  .编排序列{grid-template-columns:1fr 1fr}
+  .报告指标{grid-template-columns:repeat(2,1fr);gap:var(--space-3)}
+  .商城账本{gap:var(--space-3)}
+  .境界商品网格,.专项网格{grid-template-columns:1fr;gap:var(--space-3)}
+  /* 防横向溢出 */
+  .试题,.专业课试题,.试卷卡,.学习欢迎,.科目卡{min-width:0;max-width:100%}
+  .题干,.文章正文,.科目卡 p,.资料页标题 p{overflow-wrap:anywhere}
+}
+@media(max-width:600px){
+  .首页顶栏,.首页内容,.首页页脚{padding-left:var(--space-4);padding-right:var(--space-4)}
+  .首页欢迎{padding:var(--space-6) 0;gap:var(--space-5)}
+  .英语编排{padding:var(--space-6) 0}
+  .资料说明{flex-direction:column;align-items:flex-start;padding:var(--space-5) 0}
+  .登录卡{padding:var(--space-6) var(--space-5);border-radius:var(--radius-lg) var(--radius-lg) 2.5rem var(--radius-lg)}
+  .ai判题区{padding:var(--space-4)}
+  .ai判分按钮{width:100%;justify-content:center}
+}
+@media(max-width:380px){
+  .科目网格{grid-template-columns:1fr}
+  .编排序列{grid-template-columns:1fr}
+  .概况{grid-template-columns:1fr 1fr}
+}
+
+/* 对比度与焦点：不改品牌色，补强焦点环 */
+:focus-visible{outline:3px solid color-mix(in srgb,var(--绿,var(--主色,#18745e)) 70%,#fff);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){
+  .分类项,.套题项,.科目卡,.按钮,.首页按钮{transition:none!important}
+  .分类项:hover,.套题项:hover,.科目卡:hover{transform:none!important}
+}
