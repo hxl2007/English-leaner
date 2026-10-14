@@ -10,20 +10,29 @@
 @media(max-width:800px){.知识点网格{grid-template-columns:repeat(2,minmax(0,1fr))}.数学筛选{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:500px){.数学专项{padding:20px 16px}.知识点网格{grid-template-columns:1fr}.数学筛选{grid-template-columns:1fr}.数学筛选 button{width:100%}.专项草稿行{flex-wrap:wrap}.数学题标签{gap:6px}.专业课试题 math{font-size:1.05em}.数学专项 summary{line-height:1.6;padding:10px 0}}
 
-/* ChatGPT 网页辅助判题 · 截图作答 */
-.ai判题区{margin:22px 0;padding:20px 22px;border:1px solid #b7d0b2;border-radius:10px;background:#f4f9f2}
-.ai判题标题{font-size:15px;margin:0 0 8px;color:#185d47}
-.ai判题说明{font-size:13px;line-height:1.75;color:var(--次文字);margin:0 0 14px}
-.ai截图行,.ai动作行{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
-.ai上传按钮{display:inline-flex;align-items:center;min-height:44px;padding:8px 16px;border-radius:7px;background:var(--主色);color:#fff;font-weight:600;cursor:pointer;border:1px solid var(--主色)}
-.ai上传按钮:hover{background:#115540}
-.ai预览{min-height:72px;margin:12px 0;padding:12px;border:1px dashed #b7d0b2;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center}
-.ai预览 img{max-width:100%;max-height:280px;border-radius:6px;object-fit:contain}
-.ai预览空{font-size:13px;color:var(--次文字)}
-.ai结果标签{display:block;font-size:14px;font-weight:600;margin:14px 0 8px}
-.ai结果框{display:block;width:100%;min-height:96px;padding:12px;border:1px solid #a6c2a0;border-radius:8px;background:#fcfdfb;font:inherit;line-height:1.7;resize:vertical}
-.ai状态{font-size:13px;color:#185d47;min-height:1.4em;margin:10px 0 0}
-.ai理由{font-size:13px;line-height:1.7;color:var(--文字);margin:12px 0 0;padding:12px;background:#eef6e9;border-radius:8px}
+/* AI 框内判分 · 截图作答 */
+.ai判题区{margin:18px 0;padding:16px 18px;border:1px solid #b7d0b2;border-radius:12px;background:#f4f9f2}
+.ai判题标题{font-size:15px;margin:0 0 6px;color:#185d47}
+.ai判题说明{font-size:12.5px;line-height:1.65;color:var(--次文字);margin:0 0 10px}
+.ai截图行,.ai动作行{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.ai上传按钮{display:inline-flex;align-items:center;min-height:40px;padding:7px 14px;border-radius:8px;background:#fff;color:var(--主色);font-weight:600;cursor:pointer;border:1px solid #a6c2a0}
+.ai上传按钮:hover{border-color:var(--主色);background:#edf5e8}
+.ai判分按钮{min-width:112px;font-size:15px;box-shadow:0 2px 8px #185d4720}
+.ai判分按钮:disabled{opacity:.6}
+.ai预览{min-height:56px;margin:8px 0;padding:10px;border:1px dashed #b7d0b2;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center}
+.ai预览 img{max-width:100%;max-height:220px;border-radius:6px;object-fit:contain}
+.ai预览空{font-size:12px;color:var(--次文字)}
+.ai备用{margin-top:10px;border-top:1px dashed #c5d8c8;padding-top:8px}
+.ai备用>summary{cursor:pointer;font-size:13px;color:var(--次文字);min-height:32px;line-height:32px}
+.ai结果标签{display:block;font-size:13px;font-weight:600;margin:10px 0 6px}
+.ai结果框{display:block;width:100%;min-height:72px;padding:10px;border:1px solid #a6c2a0;border-radius:8px;background:#fcfdfb;font:inherit;line-height:1.6;resize:vertical}
+.ai状态{font-size:12.5px;color:#185d47;min-height:0;margin:6px 0 0;line-height:1.5}
+.ai理由{font-size:13px;line-height:1.65;color:var(--文字);margin:10px 0 0;padding:10px 12px;background:#eef6e9;border-radius:8px}
 .整卷标签{background:#18745e;color:#fff!important;border-radius:4px;padding:2px 8px}
 .整卷提示{font-size:12px;color:var(--次文字);line-height:1.6;margin:0 0 4px}
-@media(max-width:600px){.ai判题区{padding:16px}.ai预览 img{max-height:200px}}
+.资料清单{display:grid;gap:16px;max-width:960px}
+.试卷卡{max-width:960px}
+.答题布局{gap:28px}
+.专业课试题{padding:28px 30px}
+@media(max-width:800px){.答题布局{gap:16px}.答题导航{border-radius:10px}.专业课试题{border-radius:10px;padding:20px 18px}}
+@media(max-width:600px){.ai判题区{padding:14px}.ai预览 img{max-height:180px}.ai判分按钮{width:100%}.试卷卡{border-radius:10px}}

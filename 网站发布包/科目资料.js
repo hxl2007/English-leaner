@@ -92,7 +92,7 @@ function 更新年份(){
 function 试卷卡(卷){
   const 草稿=本机.草稿[卷.编号],来源=来源地址(卷.来源),原卷=原卷地址(卷.原卷);
   const 整卷按钮=草稿?'继续整卷作答':(['原卷转载','照片试题','官方样题'].includes(卷.类型)?'整卷开练':'开始答题');
-  return `<article class="试卷卡"><header><div class="资料标签"><span>${转义(卷.院校)}</span><span>${转义(年份说明(卷))}</span><span>${转义(卷.类型)}</span>${['原卷转载','照片试题'].includes(卷.类型)?'<span class="整卷标签">整套原卷</span>':''}</div><h2>${转义(卷.名称)}</h2></header><p class="试卷题量">${卷.题目.length} 道题 · ${卷.满分} 分${卷.类型==='复习题'||卷.练习分值?' · 练习分值':''}</p>${卷.来源说明?`<p class="来源说明">${转义(卷.来源说明)}</p>`:''}<p class="整卷提示">按试卷全部题目依次作答；选择题自动判分，填空/计算等可上传截图并用 ChatGPT 网页辅助自评。</p><div class="试卷动作"><button class="练习按钮" data-action="开卷" data-paper="${转义(卷.编号)}">${整卷按钮}<span aria-hidden="true"> →</span></button>${原卷?`<a class="首页文字链接" href="${原卷}" target="_blank" rel="noopener noreferrer">${转义(卷.对照名称||'对照原卷')} ↗</a>`:''}${来源?`<a class="首页文字链接" href="${来源}" target="_blank" rel="noopener noreferrer">试题来源 ↗</a>`:''}</div></article>`;
+  return `<article class="试卷卡"><header><div class="资料标签"><span>${转义(卷.院校)}</span><span>${转义(年份说明(卷))}</span><span>${转义(卷.类型)}</span>${['原卷转载','照片试题'].includes(卷.类型)?'<span class="整卷标签">整套原卷</span>':''}</div><h2>${转义(卷.名称)}</h2></header><p class="试卷题量">${卷.题目.length} 道题 · ${卷.满分} 分${卷.类型==='复习题'||卷.练习分值?' · 练习分值':''}</p>${卷.来源说明?`<p class="来源说明">${转义(卷.来源说明)}</p>`:''}<p class="整卷提示">按试卷全部题目依次作答；选择题自动判分，填空/计算等可上传截图后点「判分」自动自评。</p><div class="试卷动作"><button class="练习按钮" data-action="开卷" data-paper="${转义(卷.编号)}">${整卷按钮}<span aria-hidden="true"> →</span></button>${原卷?`<a class="首页文字链接" href="${原卷}" target="_blank" rel="noopener noreferrer">${转义(卷.对照名称||'对照原卷')} ↗</a>`:''}${来源?`<a class="首页文字链接" href="${来源}" target="_blank" rel="noopener noreferrer">试题来源 ↗</a>`:''}</div></article>`;
 }
 function 渲染选卷(){
   const 院校=$('#试卷院校').value,年份=$('#试卷年份').value,关键词=$('#搜索试卷').value.trim().toLowerCase();
@@ -136,7 +136,7 @@ function 作答区(q){
 }
 function 答案区(q){
   const a=答案[q.编号],单选=q.题型==='单选',分=单选?(练习.作答[q.编号]===a.正确选项?q.分值:0):练习.自评[q.编号];
-  return `<section class="参考解析" aria-label="参考答案与评分"><div class="解析标题"><h3>参考答案</h3>${单选?`<span class="${分?'作答正确':'作答错误'}">${分?'选择正确':'选择错误'} · ${分} / ${q.分值} 分</span>`:''}</div><pre>${转义(a.参考答案)}</pre>${a.数学排版?数学排版HTML(a.数学排版):''}<h3>解题说明</h3><p>${转义(a.解析)}</p>${单选?'':`<h3>自评要点</h3><ul>${a.评分要点.map(x=>`<li>${转义(x)}</li>`).join('')}</ul>${只读?`<p class="自评结果">本题自评分：${分} / ${q.分值} 分</p>`:`<label class="自评选择" for="本题自评">对照要点，给这道题评分<select id="本题自评"><option value="">请选择得分</option>${Array.from({length:q.分值+1},(_,i)=>`<option value="${i}" ${分===i?'selected':''}>${i} / ${q.分值} 分</option>`).join('')}</select></label><p class="自评说明">可手工对照要点评分，或用上方「ChatGPT 判题」粘贴结果自动写入自评分。系统不会直接登录 ChatGPT。</p>`}`}</section>`;
+  return `<section class="参考解析" aria-label="参考答案与评分"><div class="解析标题"><h3>参考答案</h3>${单选?`<span class="${分?'作答正确':'作答错误'}">${分?'选择正确':'选择错误'} · ${分} / ${q.分值} 分</span>`:''}</div><pre>${转义(a.参考答案)}</pre>${a.数学排版?数学排版HTML(a.数学排版):''}<h3>解题说明</h3><p>${转义(a.解析)}</p>${单选?'':`<h3>自评要点</h3><ul>${a.评分要点.map(x=>`<li>${转义(x)}</li>`).join('')}</ul>${只读?`<p class="自评结果">本题自评分：${分} / ${q.分值} 分</p>`:`<label class="自评选择" for="本题自评">对照要点，给这道题评分<select id="本题自评"><option value="">请选择得分</option>${Array.from({length:q.分值+1},(_,i)=>`<option value="${i}" ${分===i?'selected':''}>${i} / ${q.分值} 分</option>`).join('')}</select></label><p class="自评说明">可手工对照要点评分，或用上方「判分」一键写入自评分。</p>`}`}</section>`;
 }
 function 更新题号(){
   const 未答=new Set(专业课未答题(当前卷,练习));

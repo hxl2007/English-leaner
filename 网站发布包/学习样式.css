@@ -24,3 +24,8 @@ body{color:var(--墨);background:var(--底)}
 @media(max-height:500px) and (orientation:landscape){.含阅读 .阅读答题窗{max-height:68dvh}.含阅读 .阅读答题窗 .选项组{grid-template-columns:repeat(2,minmax(0,1fr))}.阅读答题窗 .题目头{padding-bottom:2px}.阅读答题窗 .题目操作{padding-top:5px;margin-top:5px}.阅读答题窗 .选项{min-height:38px}.阅读答题窗 .题目操作>.按钮{min-height:36px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 :root[data-主题] .按钮.次要{background:var(--纸);color:var(--绿);border-color:var(--线)}:root[data-主题] .按钮.轻{background:transparent;border-color:transparent;color:var(--绿)}:root[data-主题="夜间"] .按钮:not(.次要):not(.轻):hover{background:#acebd4;border-color:#acebd4}
+
+/* 布局留白微调 */
+.学习欢迎{margin-bottom:32px}
+.分类列表,.套题列表{gap:20px}
+@media(max-width:680px){.学习欢迎{margin-bottom:20px}.分类列表,.套题列表{gap:14px}}
