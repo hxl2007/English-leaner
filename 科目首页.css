@@ -214,3 +214,70 @@
   .分类项,.套题项,.科目卡,.按钮,.首页按钮{transition:none!important}
   .分类项:hover,.套题项:hover,.科目卡:hover{transform:none!important}
 }
+
+/* ===== 登录门禁 · 成长空间入口 2026-10-15 ===== */
+html.待登录 body > *:not(.登录跳转遮罩){visibility:hidden}
+html.待登录 #登录跳转遮罩{display:grid!important}
+.登录跳转遮罩{
+  position:fixed;inset:0;z-index:9999;
+  display:grid;place-items:center;
+  background:var(--底色,#f6f8f3);
+  color:var(--次文字,#53685f);
+  font-size:15px;
+}
+.登录跳转遮罩[hidden]{display:none!important}
+html.待登录 .登录跳转遮罩[hidden]{display:grid!important}
+.首页用户名{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:40px;padding:8px 16px;border-radius:999px;
+  font-size:14px;font-weight:700;color:var(--主色,#18745e);
+  background:#eaf4ef;border:1px solid #cfe3d8;
+  cursor:default;user-select:none;pointer-events:none;
+  max-width:10em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.首页用户名.已登录{background:linear-gradient(135deg,#e8f5ef,#dceee6)}
+.首页顶栏 nav .首页用户名{pointer-events:none}
+
+.成长空间{padding:clamp(2rem,5vw,3.5rem) 0}
+.功能网格{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(1rem,2.5vw,1.5rem);
+}
+.功能卡{
+  display:flex;flex-direction:column;
+  background:#fff;border:1px solid var(--边线,#dbe6df);
+  border-radius:18px;padding:24px 22px 18px;
+  box-shadow:0 2px 4px rgba(20,46,38,.06),0 16px 40px -18px rgba(20,46,38,.22);
+  min-height:220px;
+  transition:transform .22s cubic-bezier(.22,.9,.3,1),box-shadow .22s,border-color .18s;
+}
+.功能卡:hover{
+  transform:translateY(-6px);
+  border-color:var(--主色,#18745e);
+  box-shadow:0 4px 8px rgba(20,46,38,.08),0 24px 48px -18px rgba(23,77,67,.32);
+}
+.功能标记{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--次文字)}
+.功能状态{padding:3px 8px;background:#edf3ea;border-radius:999px;color:#2b5b44;white-space:nowrap;font-size:11px}
+.道友卡入口 .功能状态{background:#efe5d1;color:#6f5326}
+.功能符号{font-size:36px;line-height:1.2;margin:18px 0 12px;color:var(--主色,#18745e)}
+.功能卡 h3{font-size:20px;margin:0 0 8px}
+.功能卡 p{font-size:13px;color:var(--次文字);line-height:1.75;margin:0 0 16px;flex:1}
+.功能卡底{
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--边线);padding-top:14px;
+  font-size:14px;font-weight:600;color:var(--主色);margin-top:auto;
+}
+@media(max-width:900px){
+  .功能网格{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+  .功能网格{grid-template-columns:1fr}
+  .功能卡{min-height:0;padding:20px}
+  .首页顶栏 nav{flex-wrap:wrap}
+  .首页用户名{max-width:7.5em;font-size:13px;padding:6px 12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .功能卡{transition:none}
+  .功能卡:hover{transform:none}
+}

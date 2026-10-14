@@ -1,3 +1,4 @@
+import {初始化认证,是否已登录,获取当前用户} from './认证.js';
 import {验证专业课题库,新建专业课练习,专业课未答题,验证专业课练习,验证专业课答案,专业课评分} from './专业课练习.js';
 import {专业课奖励上限,专业课奖励金币,专业课预计修为文案} from './组卷.js';
 import {数学难度,题目难度,筛选数学题,组数学专项卷,数学排版HTML} from './数学分级.js';
@@ -226,9 +227,18 @@ document.addEventListener('click',async e=>{
   }catch(错误){全页错误(错误.message);$('#全页错误').focus();}
 });
 try{
-  const r=await fetch('./专业课题库.json',{cache:'no-cache'});if(!r.ok)throw new Error('题库加载失败，请刷新后重试。');库=验证专业课题库(await r.json());读取本机();
-  $('#试卷院校').innerHTML+=库.院校.map(x=>`<option value="${转义(x)}">${转义(x)}题目</option>`).join('');
-  设置数学入口();
-  const 请求院校=参数.get('院校');$('#试卷院校').value=库.院校.includes(请求院校)?请求院校:'北京联合大学';更新年份();更新地址();渲染选卷();
-  const 路由=decodeURIComponent(location.hash.slice(1));if(路由.startsWith('试卷/'))await 开卷(路由.slice(3));else if(路由.startsWith('记录/'))await 查看记录(路由.slice(3));
+  await 初始化认证();
+  if(!是否已登录()){
+    sessionStorage.setItem('登录后科目', './科目资料.html' + location.search + location.hash);
+    location.replace('./login.html');
+  }else{
+    const 用户=获取当前用户();
+    const 名槽=document.querySelector('#首页用户名');
+    if(名槽){名槽.textContent=用户?.名称?.trim()||(用户?.手机号?`学员 ${用户.手机号.slice(-4)}`:'已登录');名槽.classList.add('已登录');}
+    const r=await fetch('./专业课题库.json',{cache:'no-cache'});if(!r.ok)throw new Error('题库加载失败，请刷新后重试。');库=验证专业课题库(await r.json());读取本机();
+    $('#试卷院校').innerHTML+=库.院校.map(x=>`<option value="${转义(x)}">${转义(x)}题目</option>`).join('');
+    设置数学入口();
+    const 请求院校=参数.get('院校');$('#试卷院校').value=库.院校.includes(请求院校)?请求院校:'北京联合大学';更新年份();更新地址();渲染选卷();
+    const 路由=decodeURIComponent(location.hash.slice(1));if(路由.startsWith('试卷/'))await 开卷(路由.slice(3));else if(路由.startsWith('记录/'))await 查看记录(路由.slice(3));
+  }
 }catch(错误){全页错误(错误.message);$('#试卷统计').textContent='题库暂时无法打开。';}

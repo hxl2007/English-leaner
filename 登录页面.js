@@ -109,11 +109,12 @@ const 元素 = {
       显示成功('登录成功！');
     }
 
-    // 1秒后跳转到主页
+    // 1秒后跳转到科目首页（或登录前目标页）
     setTimeout(() => {
       const 目标 = sessionStorage.getItem('登录后科目');
       sessionStorage.removeItem('登录后科目');
-      window.location.href = 目标?.startsWith('./英语.html') ? 目标 : './index.html';
+      const 安全 = 目标 && /^\.\/[\w.\-%?#=&/\u4e00-\u9fff]+$/.test(目标) ? 目标 : './index.html';
+      window.location.replace(安全);
     }, 1000);
 
   } catch (错误) {
@@ -153,24 +154,17 @@ function 显示成功(消息) {
   document.body.appendChild(提示);
 }
 
-// 初始化
+// 初始化：已登录则进入科目首页（或登录前记下的目标页）；未登录停留在本页
 (async () => {
   try {
-    // 防止重定向循环：检查是否从主页跳转过来
-    const 来自主页 = document.referrer.includes('index.html') || sessionStorage.getItem('刚从主页跳转');
-
+    sessionStorage.removeItem('刚从主页跳转');
     await 初始化认证();
-
-    // 如果已登录且不是从主页跳转过来的，才重定向到主页
-    if (是否已登录() && !来自主页) {
-      // 清除标记
-      sessionStorage.removeItem('刚从主页跳转');
+    if (是否已登录()) {
       const 目标 = sessionStorage.getItem('登录后科目');
       sessionStorage.removeItem('登录后科目');
-      window.location.href = 目标?.startsWith('./英语.html') ? 目标 : './index.html';
-    } else if (来自主页) {
-      // 清除标记，允许用户重新登录
-      sessionStorage.removeItem('刚从主页跳转');
+      // 仅允许站内相对路径，默认科目首页
+      const 安全 = 目标 && /^\.\/[\w.\-%?#=&/\u4e00-\u9fff]+$/.test(目标) ? 目标 : './index.html';
+      window.location.replace(安全);
     }
   } catch (错误) {
     console.error('初始化失败:', 错误);

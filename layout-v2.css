@@ -572,3 +572,26 @@
   .科目卡,.首页按钮,.提交按钮,.壳 .分类项,.壳 .套题项{transition:none!important}
   .科目卡:hover,.首页按钮:hover,.提交按钮:hover{transform:none!important}
 }
+
+/* ===== 成长空间 · 与首页 v2 同节奏 ===== */
+.成长空间{padding:var(--v2-space-7,48px) 0 var(--v2-space-8,64px)}
+.功能网格{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:clamp(1.1rem,2.5vw,1.75rem)!important;
+}
+.功能卡{
+  border-radius:var(--v2-radius,18px)!important;
+  box-shadow:var(--v2-shadow)!important;
+  border:1px solid transparent!important;
+}
+.功能卡:hover{
+  box-shadow:var(--v2-shadow-hover)!important;
+  transform:translateY(-8px)!important;
+}
+.首页用户名{
+  pointer-events:none!important;
+  cursor:default!important;
+}
+@media(max-width:900px){.功能网格{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:600px){.功能网格{grid-template-columns:1fr!important}}
