@@ -1,0 +1,216 @@
+:root{--主色:#18745e;--文字:#17372e;--次文字:#53685f;--边线:#dbe6df;--底色:#f6f8f3;--白色:#fff;--暖色:#efe5d1;--蓝色:#e7eef8}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--底色);color:var(--文字);font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;font-size:16px;line-height:1.65}a{color:inherit;text-decoration:none}a,button,input,select{touch-action:manipulation}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--主色);outline-offset:5px}.跳过导航{position:fixed;top:-100px;left:20px;padding:12px;background:var(--白色);z-index:10}.跳过导航:focus{top:10px}.首页顶栏,.首页内容,.首页页脚{max-width:1200px;margin:auto;padding-left:32px;padding-right:32px}.首页顶栏{height:100px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--边线)}.首页标识{display:flex;gap:12px;align-items:center;font-size:20px;font-weight:700}.首页标识 img{width:44px;height:44px;border-radius:12px}.首页标识 small{display:block;font-size:12px;color:var(--次文字);font-weight:400;letter-spacing:1px}.首页顶栏 nav{display:flex;gap:28px}.首页顶栏 nav a{display:flex;align-items:center;min-height:44px;color:var(--次文字);font-size:14px}.首页顶栏 nav a:hover,.首页文字链接:hover{color:var(--主色)}.首页欢迎{display:grid;grid-template-columns:1.8fr 1fr;gap:60px;align-items:center;padding:65px 0}.首页眉题{font-size:13px;color:var(--主色);letter-spacing:2px;font-weight:600;margin:0 0 12px}.首页欢迎 h1{font-size:clamp(30px,4vw,48px);letter-spacing:-1px;line-height:1.3;margin:0 0 20px}.首页欢迎 p:not(.首页眉题){color:var(--次文字)}.首页按钮{display:inline-flex;align-items:center;justify-content:space-between;gap:32px;min-height:48px;padding:10px 22px;background:var(--主色);color:var(--白色);border-radius:8px;margin-top:16px;transition:background .18s}.首页按钮:hover{background:#115540}.学习札记{background:#e4eddf;border:1px solid #d5e0ce;padding:30px 38px;border-radius:5px 40px 5px 5px;transform:rotate(2deg);box-shadow:8px 10px 0 #eaf0e5}.学习札记>span{font-size:12px;letter-spacing:3px}.学习札记 h2{font-size:32px;line-height:1.5;letter-spacing:5px;font-weight:500;margin:20px 0}.札记刻度{display:flex;gap:8px;margin-top:22px}.札记刻度 b{width:34px;height:5px;background:#aec8a7}.札记刻度 b:first-child{background:var(--主色)}.首页分区头{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:24px}.首页分区头 h2{font-size:24px;line-height:1.4;margin:0}.首页分区头>span{font-size:13px;color:var(--次文字)}.科目网格{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.科目卡{background:var(--白色);border:1px solid var(--边线);padding:26px;border-radius:12px;transition:transform .18s,border-color .18s,box-shadow .18s}.科目卡:hover{transform:translateY(-4px);border-color:var(--主色);box-shadow:0 12px 28px #17372e0c}.科目标记{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--次文字)}.科目状态{padding:3px 8px;background:#edf3ea;border-radius:5px;color:#2b5b44;white-space:nowrap}.数学卡 .科目状态{background:var(--暖色);color:#6f5326}.程序卡 .科目状态{background:var(--蓝色);color:#375677}.科目符号{font-family:Georgia,serif;font-size:48px;line-height:1.2;margin:24px 0 20px;color:var(--主色)}.数学卡 .科目符号{color:#937133}.程序卡 .科目符号{color:#4c6793;font-size:40px}.科目卡 h3{font-size:25px;margin:0 0 12px}.科目卡 p{font-size:14px;color:var(--次文字);line-height:1.9;margin:0 0 26px}.科目卡底{display:flex;justify-content:space-between;border-top:1px solid var(--边线);padding-top:20px;font-size:14px;font-weight:600}.英语编排{padding:48px 0}.编排序列{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0;border:1px solid var(--边线);background:var(--白色);border-radius:12px;overflow:hidden}.编排序列 li{padding:24px;border-right:1px solid var(--边线)}.编排序列 li:last-child{border:0}.编排序列 b{color:#6c8075;font-size:12px;letter-spacing:2px}.编排序列 h3{font-size:17px;margin:12px 0 4px}.编排序列 p{color:var(--次文字);font-size:13px;margin:0 0 18px}.编排序列 strong{font-size:20px;color:var(--主色)}.首页说明{color:var(--次文字);font-size:13px}.首页文字链接{font-size:14px;color:var(--主色);display:inline-flex;align-items:center;min-height:44px;font-weight:600}.资料说明{display:flex;align-items:center;justify-content:space-between;gap:30px;border-top:1px solid var(--边线);padding:26px 0}.资料说明 h2{font-size:18px;margin:0 0 8px}.资料说明 p{font-size:13px;max-width:680px;color:var(--次文字);margin:0}.资料说明 a{flex-shrink:0}.首页页脚{text-align:center;color:var(--次文字);font-size:12px;padding-top:26px;padding-bottom:30px}.资料页标题{padding:38px 0 22px}.资料页标题 h1{margin:10px 0;font-size:36px}.资料页标题 p{color:var(--次文字);max-width:800px}.科目切换{display:flex;gap:10px;flex-wrap:wrap}.科目切换 a{min-height:44px;padding:8px 16px;border:1px solid var(--边线);border-radius:6px;background:var(--白色)}.科目切换 a[aria-current]{background:var(--主色);color:var(--白色)}.资料筛选{display:flex;gap:16px;flex-wrap:wrap;align-items:end;margin:24px 0}.资料筛选 label{display:grid;gap:5px;font-size:13px;color:var(--次文字)}.资料筛选 input,.资料筛选 select{padding:10px 12px;min-height:44px;border:1px solid var(--边线);border-radius:6px;background:var(--白色);font:inherit;color:var(--文字)}.资料筛选 input{width:260px;max-width:100%}.资料清单{display:grid;gap:16px}.资料条目{background:var(--白色);border:1px solid var(--边线);border-radius:10px;padding:22px 24px}.资料条目 header{display:flex;justify-content:space-between;gap:16px;align-items:start}.资料条目 h2{font-size:18px;margin:0}.资料条目 p{font-size:14px;color:var(--次文字);margin:10px 0}.资料条目 .资料标签{font-size:12px;display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.资料标签 span{padding:3px 8px;background:var(--底色);border-radius:4px}.资料动作{display:flex;flex-wrap:wrap;gap:20px}.资料动作 a{display:inline-flex;min-height:44px;align-items:center;color:var(--主色);font-size:14px;font-weight:600}.资料统计{font-size:14px;color:var(--次文字)}.年份缺口{padding:22px 24px;background:#f0ebdf;border-radius:10px;margin:24px 0;color:#5f5030}.年份缺口 h2{font-size:17px;margin:0 0 10px}.年份缺口 p{font-size:14px;margin:6px 0}.资料空状态{padding:32px;border:1px dashed var(--边线);text-align:center}.出错信息{color:#a52a2a}
+@media(max-width:800px){.首页欢迎{gap:30px;padding:42px 0}.学习札记{padding:24px}.学习札记 h2{font-size:25px}.科目网格{gap:12px}.科目卡{padding:20px}.科目标记{flex-direction:column;align-items:start}.资料说明{align-items:start;flex-direction:column}.首页分区头>span{display:none}.编排序列 li{padding:18px}}
+@media(max-width:600px){.首页顶栏,.首页内容,.首页页脚{padding-left:20px;padding-right:20px}.首页顶栏{height:auto;min-height:84px;flex-wrap:wrap;padding-top:16px;padding-bottom:12px;gap:10px}.首页顶栏 nav{gap:20px}.首页标识{font-size:18px}.首页欢迎{grid-template-columns:1fr;gap:24px;padding:34px 0}.学习札记{display:none}.科目网格{grid-template-columns:1fr}.科目标记{flex-direction:row;align-items:center}.科目卡{position:relative;padding:24px}.科目符号{position:absolute;right:25px;top:50px;margin:14px 0}.科目卡 h3{margin-top:22px}.科目卡 p{max-width:75%}.编排序列{grid-template-columns:1fr 1fr}.编排序列 li{border-bottom:1px solid var(--边线)}.编排序列 li:nth-child(2){border-right:0}.编排序列 li:nth-child(3){border-bottom:0}.英语编排{padding:36px 0}.首页分区头 h2{font-size:22px}.资料条目 header{flex-direction:column;gap:8px}.资料筛选 label{width:100%}.资料筛选 input{width:100%}.资料页标题 h1{font-size:30px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.科目卡,.首页按钮{transition:none}.科目卡:hover{transform:none}.学习札记{transform:none}}
+
+/* ===== arrange 节奏微调 2026-10-15 ===== */
+.首页内容{padding-bottom:clamp(2rem,4vw,3rem)}
+.首页欢迎 h1{letter-spacing:-.02em;max-width:16ch}
+.首页分区头 h2{letter-spacing:-.01em}
+.科目卡{transition:transform .18s cubic-bezier(.22,.9,.3,1),box-shadow .18s,border-color .18s}
+.编排序列 li+li{border-left:0}
+.资料条目{box-shadow:0 1px 2px rgba(20,46,38,.05)}
+.资料筛选{gap:var(--space-4,16px);margin:var(--space-5,24px) 0}
+@media(max-width:600px){
+  .首页欢迎 h1{max-width:none;font-size:clamp(1.75rem,7vw,2.25rem)}
+  .科目符号{opacity:.35}
+}
+
+/* ===== layout-polish merged ===== */
+/* ===== 布局抛光层 2026-10-15 =====
+   依据：impeccable arrange/polish、refactoring-ui spacing、
+   responsive-ui-qa、tokyn anti-slop。保留青绿书院品牌，只调节奏与层级。 */
+
+:root{
+  /* 间距尺度：4→8→12→16→24→32→48→64（≥25% 跳变） */
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;
+  --space-5:24px;--space-6:32px;--space-7:48px;--space-8:64px;
+  /* 阴影尺度：克制、语义化 */
+  --shadow-sm:0 1px 2px rgba(20,46,38,.06);
+  --shadow-md:0 4px 14px -6px rgba(20,46,38,.14);
+  --shadow-lg:0 12px 28px -14px rgba(20,46,38,.22);
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;
+  --content-pad:clamp(1.25rem,2.5vw,2.5rem);
+  --section-gap:clamp(1.5rem,3vw,2.5rem);
+}
+
+/* —— 全局节奏：组内紧、组间疏 —— */
+.内容{padding-top:clamp(1.5rem,3vw,2.25rem);padding-bottom:clamp(2.5rem,5vw,3.75rem)}
+.页头{margin-bottom:var(--space-6);gap:var(--space-5)}
+.分区头{margin:var(--space-6) 0 var(--space-4)}
+.概况{margin-bottom:var(--space-7);padding:var(--space-5) 0}
+.分类网格,.套题列表{gap:var(--space-5)}
+.分类项,.套题项,.试题,.答题卡,.道友卡,.境界商品,.专项卡,.学习报告,.反馈卡{
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+}
+.分类项:hover,.套题项:hover,.科目卡:hover{
+  box-shadow:var(--shadow-md);
+}
+.试题{padding:clamp(1.25rem,2.5vw,2rem)}
+.答题布局{gap:var(--space-6)}
+.题目操作{margin-top:var(--space-6);padding-top:var(--space-5);gap:var(--space-3)}
+.选项组{gap:var(--space-3)}
+.选项{border-radius:var(--radius-sm);min-height:48px}
+.按钮{border-radius:var(--radius-sm);min-height:44px}
+.按钮.次要{box-shadow:none}
+.按钮.轻{box-shadow:none}
+.继续条{margin-bottom:var(--space-6);border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+
+/* 首页欢迎：加强组间留白，正文可读宽度 */
+.学习欢迎{
+  gap:var(--space-6);
+  padding:clamp(1.5rem,3vw,2.25rem) clamp(1.5rem,3.5vw,2.4rem);
+  margin-bottom:var(--space-7);
+  border-radius:var(--radius-lg) var(--radius-lg) 3rem var(--radius-lg);
+}
+.学习欢迎 p:not(.首页问候){max-width:62ch;line-height:1.75}
+.模拟入口{gap:var(--space-6);margin-top:var(--space-2)}
+.成长横栏{margin-top:var(--space-6);padding:var(--space-6) 0;gap:var(--space-5)}
+
+/* 科目首页（index / 科目资料） */
+.首页顶栏{height:auto;min-height:88px;padding-top:var(--space-4);padding-bottom:var(--space-4)}
+.首页欢迎{gap:clamp(2rem,5vw,3.75rem);padding:clamp(2.5rem,6vw,4rem) 0}
+.首页欢迎 p:not(.首页眉题){max-width:42ch;line-height:1.75;font-size:1.05rem}
+.首页分区头{margin-bottom:var(--space-5);align-items:flex-end}
+.科目网格{gap:var(--space-5)}
+.科目卡{
+  padding:var(--space-5) var(--space-5) var(--space-4);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+  display:flex;flex-direction:column;min-height:100%;
+}
+.科目卡 p{flex:1;margin-bottom:var(--space-5)}
+.科目卡底{padding-top:var(--space-4);margin-top:auto}
+.科目符号{margin:var(--space-5) 0 var(--space-4)}
+.编排序列{border-radius:var(--radius-md);box-shadow:var(--shadow-sm);overflow:hidden}
+.编排序列 li{padding:var(--space-5)}
+.英语编排{padding:var(--space-7) 0}
+.资料说明{
+  gap:var(--space-5);
+  padding:var(--space-6) 0;
+  margin-top:var(--space-4);
+}
+.学习札记{
+  padding:var(--space-5) var(--space-6);
+  border-radius:var(--radius-sm) 2.5rem var(--radius-sm) var(--radius-sm);
+  box-shadow:var(--shadow-md);
+}
+.首页按钮{border-radius:var(--radius-sm);min-height:48px;padding:12px 22px;gap:var(--space-4)}
+.首页页脚{padding-top:var(--space-6);padding-bottom:var(--space-7);letter-spacing:.02em}
+
+/* 专业课 / AI 判分区：分组更清晰 */
+.试卷卡,.专业课试题,.数学专项,.答题导航{
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+}
+.资料页标题{padding:var(--space-6) 0 var(--space-5)}
+.资料页标题 p{max-width:68ch;line-height:1.75}
+.试卷卡{padding:var(--space-5) var(--space-6);margin-bottom:0}
+.试卷动作{gap:var(--space-4);margin-top:var(--space-5)}
+.专业课试题{padding:clamp(1.25rem,2.5vw,1.875rem)}
+.专业课选项{gap:var(--space-3)}
+.专业课选项行{border-radius:var(--radius-sm);min-height:52px;padding:14px 16px}
+.ai判题区{
+  margin:var(--space-5) 0;
+  padding:var(--space-4) var(--space-5);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+}
+.ai截图行,.ai动作行{gap:var(--space-2);margin:var(--space-3) 0}
+.ai判分按钮,.练习按钮,.次按钮{min-height:44px;border-radius:var(--radius-sm)}
+.成绩卡{border-radius:var(--radius-md);padding:var(--space-5) var(--space-6);gap:var(--space-5)}
+.资料清单{gap:var(--space-4)}
+.数学专项{padding:var(--space-5) var(--space-6);margin:var(--space-5) 0 var(--space-6)}
+.数学筛选{gap:var(--space-4);margin:var(--space-5) 0 var(--space-3)}
+.知识点网格{gap:var(--space-3)}
+
+/* 修行 / 商城 */
+.每日任务{margin:var(--space-5) 0 var(--space-6);padding:var(--space-5) var(--space-6);gap:var(--space-5)}
+.商城账本{gap:var(--space-5);padding:var(--space-5) 0;margin-bottom:var(--space-6)}
+.境界商品网格,.专项网格{gap:var(--space-4)}
+.境界商品,.专项卡{padding:var(--space-5)}
+.学习报告{padding:var(--space-5);margin:var(--space-5) 0 var(--space-6)}
+.报告指标{gap:var(--space-4);margin:var(--space-5) 0}
+
+/* 登录 */
+.登录卡{
+  border-radius:var(--radius-lg) var(--radius-lg) 3rem var(--radius-lg);
+  box-shadow:var(--shadow-lg);
+  padding:clamp(2rem,4vw,2.75rem);
+  max-width:440px;
+}
+.登录卡 .副标题{margin-bottom:var(--space-6);line-height:1.65}
+.表单组{margin-bottom:var(--space-5)}
+.表单组 label{margin-bottom:var(--space-2)}
+.表单组 input{min-height:48px;border-radius:var(--radius-sm);padding:12px 14px}
+.提交按钮{min-height:48px;border-radius:var(--radius-sm);margin-top:var(--space-3)}
+.切换提示{margin-top:var(--space-6)}
+
+/* 社交 */
+.道友卡{padding:var(--space-4) var(--space-5);margin-bottom:var(--space-4)}
+.道友页签{gap:var(--space-5);margin-bottom:var(--space-4)}
+.论道题{padding:var(--space-5);border-radius:var(--radius-md)}
+.论道选项{gap:var(--space-3)}
+
+/* 阅读答题窗：触控与安全区 */
+.含阅读 .阅读答题窗{
+  padding:12px clamp(12px,3vw,30px) max(12px,env(safe-area-inset-bottom));
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow:0 -8px 28px rgba(23,77,67,.12);
+}
+.阅读答题窗 .选项{min-height:46px}
+.文章正文{max-width:72ch;line-height:1.9}
+
+/* 顶栏 / 侧栏微调 */
+.顶栏{height:68px;padding-left:clamp(1rem,2.5vw,2.5rem);padding-right:clamp(1rem,2.5vw,2.5rem)}
+.导航{gap:var(--space-1)}
+.导航 a{border-radius:var(--radius-sm);min-height:44px}
+
+/* —— 响应式：responsive-ui-qa —— */
+@media(max-width:1150px){
+  .分类网格,.套题列表{gap:var(--space-4)}
+  .答题布局{gap:var(--space-4)}
+}
+@media(max-width:900px){
+  .学习欢迎{gap:var(--space-5)}
+  .科目网格{gap:var(--space-4)}
+}
+@media(max-width:680px){
+  .内容{padding-left:var(--space-4);padding-right:var(--space-4);padding-bottom:6.5rem}
+  .页头{margin-bottom:var(--space-5)}
+  .概况{margin-bottom:var(--space-5);padding:var(--space-4) 0}
+  .分类网格,.套题列表,.科目网格{gap:var(--space-3)}
+  .分类项,.套题项,.试题,.科目卡{padding:var(--space-4)}
+  .学习欢迎{margin-bottom:var(--space-5);padding:var(--space-5) var(--space-4);border-radius:var(--radius-md) var(--radius-md) 2.5rem var(--radius-md)}
+  .选项,.专业课选项行,.按钮,.练习按钮,.次按钮,.ai判分按钮{min-height:44px}
+  .手机导航 a{min-width:48px;min-height:48px;justify-content:center}
+  .编排序列{grid-template-columns:1fr 1fr}
+  .报告指标{grid-template-columns:repeat(2,1fr);gap:var(--space-3)}
+  .商城账本{gap:var(--space-3)}
+  .境界商品网格,.专项网格{grid-template-columns:1fr;gap:var(--space-3)}
+  /* 防横向溢出 */
+  .试题,.专业课试题,.试卷卡,.学习欢迎,.科目卡{min-width:0;max-width:100%}
+  .题干,.文章正文,.科目卡 p,.资料页标题 p{overflow-wrap:anywhere}
+}
+@media(max-width:600px){
+  .首页顶栏,.首页内容,.首页页脚{padding-left:var(--space-4);padding-right:var(--space-4)}
+  .首页欢迎{padding:var(--space-6) 0;gap:var(--space-5)}
+  .英语编排{padding:var(--space-6) 0}
+  .资料说明{flex-direction:column;align-items:flex-start;padding:var(--space-5) 0}
+  .登录卡{padding:var(--space-6) var(--space-5);border-radius:var(--radius-lg) var(--radius-lg) 2.5rem var(--radius-lg)}
+  .ai判题区{padding:var(--space-4)}
+  .ai判分按钮{width:100%;justify-content:center}
+}
+@media(max-width:380px){
+  .科目网格{grid-template-columns:1fr}
+  .编排序列{grid-template-columns:1fr}
+  .概况{grid-template-columns:1fr 1fr}
+}
+
+/* 对比度与焦点：不改品牌色，补强焦点环 */
+:focus-visible{outline:3px solid color-mix(in srgb,var(--绿,var(--主色,#18745e)) 70%,#fff);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){
+  .分类项,.套题项,.科目卡,.按钮,.首页按钮{transition:none!important}
+  .分类项:hover,.套题项:hover,.科目卡:hover{transform:none!important}
+}
