@@ -1,0 +1,574 @@
+/* ===== 布局改版 v2 · 2026-10-15 =====
+   依据：impeccable arrange/bolder、refactoring-ui spacing/button hierarchy
+   目标：一眼能看出变化——加大留白、浮起卡片、强化主 CTA、侧栏对比
+   不改业务逻辑；青绿书院品牌色保留并加强对比 */
+
+:root{
+  --v2-space-1:4px;--v2-space-2:8px;--v2-space-3:12px;--v2-space-4:16px;
+  --v2-space-5:24px;--v2-space-6:32px;--v2-space-7:48px;--v2-space-8:64px;--v2-space-9:96px;
+  --v2-radius:18px;
+  --v2-radius-lg:24px;
+  --v2-shadow:0 2px 4px rgba(20,46,38,.06),0 16px 40px -18px rgba(20,46,38,.28);
+  --v2-shadow-hover:0 4px 8px rgba(20,46,38,.08),0 28px 56px -20px rgba(23,77,67,.38);
+  --v2-shadow-cta:0 8px 24px -6px rgba(24,116,94,.45);
+  --v2-max:1080px;
+  --v2-green:#18745e;
+  --v2-green-deep:#0f4f40;
+}
+
+/* ========== 1. 首页 index ========== */
+.首页顶栏,.首页内容,.首页页脚{
+  max-width:var(--v2-max);
+  padding-left:clamp(1.25rem,4vw,2.75rem);
+  padding-right:clamp(1.25rem,4vw,2.75rem);
+}
+.首页顶栏{
+  height:auto;
+  min-height:72px;
+  padding-top:20px;
+  padding-bottom:20px;
+  margin-bottom:8px;
+  border-bottom:0;
+  position:sticky;
+  top:0;
+  z-index:30;
+  background:color-mix(in srgb,var(--底色,#f6f8f3) 92%,transparent);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.首页标识{
+  gap:14px;
+  font-size:22px;
+}
+.首页标识 img{
+  width:48px;height:48px;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(24,116,94,.2);
+}
+.首页顶栏 nav{
+  gap:8px;
+  padding:6px;
+  background:#fff;
+  border-radius:999px;
+  border:1px solid var(--边线,#dbe6df);
+  box-shadow:0 2px 8px rgba(20,46,38,.06);
+}
+.首页顶栏 nav a{
+  padding:8px 16px;
+  border-radius:999px;
+  font-weight:600;
+  min-height:40px;
+}
+.首页顶栏 nav a:hover{
+  background:var(--浅绿,#eaf4ef);
+  color:var(--主色,var(--v2-green));
+}
+
+/* 英雄区：大留白 + 分区背景带 */
+.首页欢迎{
+  display:grid;
+  grid-template-columns:1.35fr .9fr;
+  gap:clamp(2.5rem,6vw,4.5rem);
+  align-items:center;
+  padding:clamp(3.5rem,8vw,5.5rem) 0 clamp(3rem,6vw,4.5rem);
+  margin:0 0 var(--v2-space-8);
+  border-bottom:0;
+  position:relative;
+}
+.首页欢迎::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  width:100vw;
+  top:0;bottom:0;
+  background:
+    radial-gradient(ellipse 60% 80% at 85% 20%,rgba(24,116,94,.12),transparent 55%),
+    radial-gradient(ellipse 50% 60% at 10% 80%,rgba(239,229,209,.55),transparent 50%),
+    linear-gradient(180deg,#eef5f0 0%,transparent 100%);
+  z-index:-1;
+  pointer-events:none;
+}
+.首页欢迎 h1{
+  font-size:clamp(2.25rem,5.5vw,3.5rem)!important;
+  line-height:1.2!important;
+  letter-spacing:-.03em!important;
+  margin:0 0 1.25rem!important;
+  max-width:12ch;
+}
+.首页眉题{
+  font-size:14px!important;
+  letter-spacing:.18em!important;
+  text-transform:uppercase;
+  margin-bottom:16px!important;
+}
+.首页欢迎 p:not(.首页眉题){
+  font-size:1.125rem!important;
+  line-height:1.8!important;
+  max-width:36ch;
+  color:var(--次文字,#53685f);
+}
+/* 主 CTA：更大、更醒目 */
+.首页按钮{
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:space-between;
+  gap:28px;
+  min-height:56px!important;
+  padding:14px 28px!important;
+  margin-top:28px!important;
+  font-size:1.05rem;
+  font-weight:700;
+  border-radius:14px!important;
+  background:var(--主色,var(--v2-green))!important;
+  color:#fff!important;
+  box-shadow:var(--v2-shadow-cta)!important;
+  transition:transform .2s,box-shadow .2s,background .18s!important;
+}
+.首页按钮:hover{
+  background:var(--v2-green-deep)!important;
+  transform:translateY(-3px);
+  box-shadow:0 12px 32px -8px rgba(24,116,94,.55)!important;
+}
+.学习札记{
+  padding:36px 40px!important;
+  border-radius:16px 48px 16px 16px!important;
+  background:linear-gradient(160deg,#dcead6 0%,#e8f0e4 100%)!important;
+  border:2px solid #c5d9bc!important;
+  box-shadow:12px 14px 0 #d5e4cf,0 20px 40px -20px rgba(20,46,38,.25)!important;
+  transform:rotate(1.5deg);
+}
+.学习札记 h2{
+  font-size:clamp(1.75rem,3vw,2.25rem)!important;
+  margin:24px 0!important;
+}
+
+/* 科目网格：更大间距、浮起卡片 */
+#科目{
+  padding:var(--v2-space-7) 0 var(--v2-space-8);
+}
+.首页分区头{
+  margin-bottom:var(--v2-space-6)!important;
+  padding-bottom:var(--v2-space-4);
+  border-bottom:2px solid var(--边线,#dbe6df);
+}
+.首页分区头 h2{
+  font-size:clamp(1.5rem,3vw,1.875rem)!important;
+}
+.科目网格{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:clamp(1.25rem,3vw,2rem)!important;
+}
+.科目卡{
+  padding:32px 28px 24px!important;
+  border-radius:var(--v2-radius)!important;
+  border:1px solid transparent!important;
+  background:#fff!important;
+  box-shadow:var(--v2-shadow)!important;
+  min-height:280px;
+  transition:transform .22s cubic-bezier(.22,.9,.3,1),box-shadow .22s!important;
+}
+.科目卡:hover{
+  transform:translateY(-8px)!important;
+  box-shadow:var(--v2-shadow-hover)!important;
+  border-color:var(--主色,var(--v2-green))!important;
+}
+.科目符号{
+  font-size:56px!important;
+  margin:28px 0 20px!important;
+}
+.科目卡 h3{
+  font-size:1.625rem!important;
+  margin-bottom:14px!important;
+}
+.科目卡底{
+  margin-top:auto;
+  padding-top:20px!important;
+  border-top:2px solid var(--边线,#dbe6df)!important;
+  color:var(--主色,var(--v2-green));
+  font-size:15px!important;
+}
+.科目状态{
+  padding:5px 12px!important;
+  border-radius:999px!important;
+  font-weight:600;
+}
+
+/* 英语编排 / 资料说明 */
+.英语编排{
+  padding:var(--v2-space-8) 0!important;
+  margin-top:var(--v2-space-5);
+}
+.编排序列{
+  border:0!important;
+  border-radius:var(--v2-radius)!important;
+  box-shadow:var(--v2-shadow)!important;
+  gap:0;
+  overflow:hidden;
+  background:#fff!important;
+}
+.编排序列 li{
+  padding:32px 28px!important;
+  border-right:1px solid var(--边线,#dbe6df);
+}
+.编排序列 strong{
+  font-size:1.5rem!important;
+}
+.资料说明{
+  margin:var(--v2-space-7) 0 var(--v2-space-8)!important;
+  padding:clamp(1.75rem,4vw,2.5rem) clamp(1.5rem,4vw,2.5rem)!important;
+  background:#fff;
+  border-radius:var(--v2-radius);
+  box-shadow:var(--v2-shadow);
+  border:0!important;
+  gap:var(--v2-space-6)!important;
+}
+.资料说明 h2{
+  font-size:1.35rem!important;
+}
+.首页文字链接{
+  font-size:15px!important;
+  padding:10px 0;
+  gap:8px;
+}
+.首页页脚{
+  padding:var(--v2-space-7) clamp(1.25rem,4vw,2.75rem) var(--v2-space-8)!important;
+  font-size:13px!important;
+  letter-spacing:.04em;
+}
+
+/* 资料页标题 / 科目列表 */
+.资料页标题{
+  padding:clamp(2.5rem,5vw,3.5rem) 0 var(--v2-space-6)!important;
+  max-width:var(--v2-max);
+}
+.资料页标题 h1{
+  font-size:clamp(2rem,4vw,2.75rem)!important;
+  letter-spacing:-.02em;
+}
+.资料页标题 p{
+  font-size:1.05rem!important;
+  max-width:62ch!important;
+  line-height:1.85!important;
+  margin-top:16px;
+}
+.科目切换{
+  gap:12px!important;
+  margin-bottom:var(--v2-space-6);
+}
+.科目切换 a{
+  min-height:48px!important;
+  padding:10px 20px!important;
+  border-radius:12px!important;
+  font-weight:600;
+  box-shadow:0 1px 3px rgba(20,46,38,.06);
+}
+.科目切换 a[aria-current]{
+  box-shadow:var(--v2-shadow-cta);
+}
+.资料清单,.试卷卡{
+  max-width:var(--v2-max)!important;
+}
+.试卷卡,.数学专项{
+  padding:32px 36px!important;
+  border-radius:var(--v2-radius)!important;
+  border:1px solid transparent!important;
+  box-shadow:var(--v2-shadow)!important;
+  margin-bottom:var(--v2-space-5)!important;
+}
+.资料清单{
+  gap:var(--v2-space-5)!important;
+}
+.试卷动作{
+  gap:16px!important;
+  margin-top:24px!important;
+}
+.练习按钮{
+  min-height:48px!important;
+  padding:12px 22px!important;
+  border-radius:12px!important;
+  font-size:15px!important;
+  box-shadow:var(--v2-shadow-cta);
+}
+.次按钮{
+  min-height:48px!important;
+  padding:12px 20px!important;
+  border-radius:12px!important;
+}
+
+/* ========== 2. 专业课答题：侧栏/主区对比 + 浮起 ========== */
+.答题布局{
+  grid-template-columns:260px minmax(0,1fr)!important;
+  gap:clamp(1.75rem,4vw,2.75rem)!important;
+  align-items:start;
+}
+.答题导航{
+  padding:28px 24px!important;
+  border-radius:var(--v2-radius)!important;
+  border:0!important;
+  background:#fff!important;
+  box-shadow:var(--v2-shadow)!important;
+}
+.专业课试题{
+  padding:clamp(1.75rem,3.5vw,2.5rem) clamp(1.5rem,3vw,2.25rem)!important;
+  border-radius:var(--v2-radius)!important;
+  border:0!important;
+  background:#fff!important;
+  box-shadow:var(--v2-shadow)!important;
+}
+.题号网格{
+  gap:10px!important;
+}
+.题号网格 button{
+  min-height:46px!important;
+  border-radius:10px!important;
+  font-weight:600;
+}
+.成绩卡{
+  padding:32px 36px!important;
+  border-radius:var(--v2-radius)!important;
+  gap:var(--v2-space-6)!important;
+  box-shadow:var(--v2-shadow);
+}
+
+/* AI 判分区 */
+.ai判题区{
+  margin:var(--v2-space-6) 0!important;
+  padding:var(--v2-space-5) var(--v2-space-6)!important;
+  border-radius:var(--v2-radius)!important;
+  border:2px solid #a8c9b8!important;
+  background:linear-gradient(165deg,#f0f7ed 0%,#f7fbf5 100%)!important;
+  box-shadow:0 8px 24px -12px rgba(24,116,94,.25)!important;
+  max-width:100%;
+}
+.ai判题标题{
+  font-size:1.125rem!important;
+  margin-bottom:10px!important;
+}
+.ai判题说明{
+  font-size:13.5px!important;
+  margin-bottom:16px!important;
+}
+.ai截图行,.ai动作行{
+  gap:12px!important;
+  margin:14px 0!important;
+}
+.ai判分按钮{
+  min-height:48px!important;
+  min-width:128px!important;
+  padding:12px 22px!important;
+  border-radius:12px!important;
+  font-size:16px!important;
+  font-weight:700;
+  box-shadow:var(--v2-shadow-cta)!important;
+}
+.ai上传按钮{
+  min-height:48px!important;
+  padding:10px 18px!important;
+  border-radius:12px!important;
+}
+.ai预览{
+  min-height:72px!important;
+  padding:16px!important;
+  border-radius:12px!important;
+  margin:12px 0!important;
+}
+
+/* ========== 3. 英语练习室：侧栏更宽更深、主内容浮起 ========== */
+.壳 .侧栏{
+  width:240px!important;
+  padding:36px 20px!important;
+  background:linear-gradient(180deg,#134a40 0%,#0d3a32 100%)!important;
+  border-right:0!important;
+  box-shadow:8px 0 32px -12px rgba(9,37,27,.45);
+}
+.壳 .主区{
+  margin-left:240px!important;
+  background:var(--底,#f0f5f3);
+}
+.壳 .内容{
+  max-width:1200px;
+  padding:clamp(2rem,4vw,3rem) clamp(1.5rem,3.5vw,2.75rem) clamp(3rem,5vw,4.5rem)!important;
+}
+.壳 .顶栏{
+  height:72px!important;
+  padding-left:clamp(1.25rem,3vw,2.5rem)!important;
+  padding-right:clamp(1.25rem,3vw,2.5rem)!important;
+  box-shadow:0 1px 0 rgba(20,46,38,.06);
+}
+.壳 .导航 a{
+  border-radius:12px!important;
+  padding:14px 16px!important;
+  min-height:48px;
+}
+.壳 .导航 a.选中{
+  background:#fff!important;
+  color:#0d3a32!important;
+  font-weight:700;
+  box-shadow:0 4px 14px rgba(0,0,0,.12)!important;
+}
+.壳 .试题,.壳 .答题卡,.壳 .套题项,.壳 .分类项,.壳 .学习欢迎{
+  border-radius:var(--v2-radius)!important;
+  box-shadow:var(--v2-shadow)!important;
+  border-color:transparent!important;
+}
+.壳 .答题布局{
+  grid-template-columns:minmax(0,1fr) 280px!important;
+  gap:clamp(1.5rem,3.5vw,2.5rem)!important;
+}
+.壳 .试题{
+  padding:clamp(1.75rem,3vw,2.5rem)!important;
+}
+.壳 .答题卡{
+  padding:28px 24px!important;
+}
+.壳 .题号网格{
+  gap:10px!important;
+  margin:24px 0!important;
+}
+.壳 .题号{
+  border-radius:10px!important;
+  min-height:40px;
+  font-weight:600;
+}
+.壳 .分类网格{
+  gap:var(--v2-space-5)!important;
+}
+.壳 .分类项{
+  min-height:190px!important;
+  padding:28px 24px!important;
+}
+.壳 .套题列表{
+  gap:var(--v2-space-5)!important;
+}
+.壳 .套题项{
+  padding:28px!important;
+}
+.壳 .按钮:not(.次要):not(.轻){
+  min-height:46px;
+  border-radius:12px!important;
+  padding:12px 20px;
+  box-shadow:var(--v2-shadow-cta);
+}
+.壳 .学习欢迎{
+  padding:clamp(2rem,4vw,2.75rem) clamp(1.75rem,3.5vw,2.5rem)!important;
+  margin-bottom:var(--v2-space-7)!important;
+  gap:var(--v2-space-6)!important;
+}
+
+/* ========== 4. 登录页 ========== */
+.登录壳{
+  padding:clamp(1.5rem,4vw,3rem)!important;
+}
+.登录卡{
+  max-width:460px!important;
+  padding:clamp(2.5rem,5vw,3.25rem) clamp(2rem,4vw,2.75rem)!important;
+  border-radius:20px 20px 56px 20px!important;
+  box-shadow:0 24px 64px -16px rgba(15,79,64,.35)!important;
+  border:0!important;
+}
+.登录卡 h1{
+  font-size:clamp(1.75rem,4vw,2.25rem)!important;
+  margin-bottom:12px!important;
+}
+.登录卡 .副标题{
+  margin-bottom:var(--v2-space-7)!important;
+  font-size:15px!important;
+}
+.表单组{
+  margin-bottom:var(--v2-space-5)!important;
+}
+.表单组 label{
+  margin-bottom:8px!important;
+  font-size:14px!important;
+}
+.表单组 input{
+  min-height:52px!important;
+  padding:14px 16px!important;
+  border-radius:12px!important;
+  font-size:16px!important;
+  border-width:1.5px!important;
+}
+.提交按钮{
+  min-height:52px!important;
+  margin-top:var(--v2-space-4)!important;
+  border-radius:14px!important;
+  font-size:16px!important;
+  font-weight:700;
+  box-shadow:var(--v2-shadow-cta)!important;
+}
+.提交按钮:hover{
+  transform:translateY(-2px)!important;
+  box-shadow:0 12px 28px -8px rgba(24,116,94,.5)!important;
+}
+.切换提示{
+  margin-top:var(--v2-space-7)!important;
+  padding-top:var(--v2-space-5);
+  border-top:1px solid var(--线,#e2e8e4);
+}
+.标识{
+  margin-bottom:var(--v2-space-6)!important;
+}
+.标识 img{
+  width:48px!important;
+  height:48px!important;
+  border-radius:12px!important;
+}
+
+/* ========== 响应式 ========== */
+@media(max-width:900px){
+  .科目网格{grid-template-columns:1fr!important;gap:var(--v2-space-4)!important}
+  .首页欢迎{grid-template-columns:1fr!important;padding:var(--v2-space-7) 0!important}
+  .学习札记{transform:none;max-width:420px}
+  .编排序列{grid-template-columns:1fr 1fr!important}
+  .答题布局{grid-template-columns:1fr!important;gap:var(--v2-space-5)!important}
+  .壳 .侧栏{width:80px!important;padding:24px 10px!important}
+  .壳 .主区{margin-left:80px!important}
+  .壳 .答题布局{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(max-width:680px){
+  .首页顶栏{position:static;background:transparent;backdrop-filter:none}
+  .首页顶栏 nav{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}
+  .首页欢迎 h1{max-width:none!important;font-size:clamp(1.85rem,8vw,2.35rem)!important}
+  .学习札记{display:none!important}
+  .科目卡{min-height:0;padding:24px 22px!important}
+  .科目符号{font-size:40px!important;opacity:.4}
+  .编排序列{grid-template-columns:1fr!important}
+  .编排序列 li{border-right:0;border-bottom:1px solid var(--边线,#dbe6df)}
+  .资料说明{flex-direction:column;align-items:flex-start}
+  .壳 .侧栏{display:none!important}
+  .壳 .主区{margin-left:0!important}
+  .壳 .内容{padding:1.25rem 1rem 6.5rem!important}
+  .答题导航{
+    position:static!important;
+    display:flex;
+    flex-direction:column;
+  }
+  /* 移动端题号横滑条 */
+  .答题导航 .题号网格{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    overflow-x:auto;
+    gap:8px!important;
+    padding-bottom:8px;
+    -webkit-overflow-scrolling:touch;
+    scroll-snap-type:x proximity;
+  }
+  .答题导航 .题号网格 button{
+    flex:0 0 44px;
+    width:44px;
+    scroll-snap-align:start;
+  }
+  .壳 .题号网格{
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  }
+  .ai判题区{padding:var(--v2-space-4)!important}
+  .ai判分按钮{width:100%;justify-content:center}
+  .试卷卡,.数学专项{padding:22px 18px!important}
+  .登录卡{padding:2rem 1.35rem!important;border-radius:18px 18px 40px 18px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .科目卡,.首页按钮,.提交按钮,.壳 .分类项,.壳 .套题项{transition:none!important}
+  .科目卡:hover,.首页按钮:hover,.提交按钮:hover{transform:none!important}
+}
