@@ -239,3 +239,27 @@
   .分类项,.套题项,.科目卡,.按钮,.首页按钮{transition:none!important}
   .分类项:hover,.套题项:hover,.科目卡:hover{transform:none!important}
 }
+
+/* ===== 道友/切磋优化 2026-10-15 ===== */
+.状态点{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.状态点.在线{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.25)}
+.状态点.今日{background:#f59e0b}
+.状态点.离线{background:#94a3b8}
+.徽标.绿{background:#dcfce7;color:#166534}
+.按钮.醒目,.醒目{background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;border:none;box-shadow:0 4px 14px -4px rgba(15,118,110,.45)}
+.按钮.醒目:hover{filter:brightness(1.06)}
+.申请卡{border-color:#f59e0b;background:linear-gradient(180deg,#fffbeb,#fff)}
+.申请行{background:#fff7ed;border-radius:10px;padding:12px 14px!important;margin:8px 0;border:1px solid #fed7aa}
+.好友网格{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.好友卡{border:1px solid var(--线);border-radius:14px;padding:16px;background:var(--纸);box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.05));display:flex;flex-direction:column;gap:12px}
+.好友卡:hover{box-shadow:var(--shadow-md,0 4px 14px rgba(0,0,0,.08));border-color:#99f6e4}
+.道友名片头{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:4px}
+.道友名片头 strong{font-size:16px}
+.道友数据{margin:0;font-size:13px;color:var(--灰)}
+.活跃说明{color:var(--灰);font-size:12px}
+.好友动作{flex-wrap:wrap}
+.空状态大{padding:36px 20px;text-align:center}
+.空图标{font-size:42px;line-height:1;margin-bottom:8px;opacity:.7}
+.切磋条{border-color:#14b8a6;background:linear-gradient(90deg,#ecfdf5,#fff)}
+.切磋行{align-items:center}
+@media(max-width:720px){.好友网格{grid-template-columns:1fr}}

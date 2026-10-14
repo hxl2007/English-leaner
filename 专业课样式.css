@@ -242,3 +242,15 @@
   .分类项,.套题项,.科目卡,.按钮,.首页按钮{transition:none!important}
   .分类项:hover,.套题项:hover,.科目卡:hover{transform:none!important}
 }
+
+/* ===== 专业课修为标签 2026-10-15 ===== */
+.修为标签{
+  background:linear-gradient(135deg,#fef3c7,#fde68a);
+  color:#92400e;border:1px solid #f59e0b;border-radius:999px;
+  padding:2px 10px;font-size:12px;font-weight:700;letter-spacing:.02em;
+}
+.修为预告{color:#b45309;font-weight:600}
+.数学修为提示{margin:.5rem 0 0;color:#b45309;font-size:14px}
+.修为结算{margin:.75rem 0;padding:.65rem .9rem;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;color:#92400e}
+.修为结算 strong{color:#b45309;font-size:1.15em}
+.知识点按钮 small{display:block;margin-top:4px;opacity:.85}

@@ -34,3 +34,30 @@ export function 合并境界小段(本,另,本期,另期){
  const 读=(s,期,名)=>Math.max(1,Math.min(9,Number(s.境界小段?.[名])||(!s.境界小段&&名===期?Number(s.小段):1)||1));
  return Object.fromEntries(境界.map(名=>[名,Math.max(读(本,本期,名),读(另,另期,名))]));
 }
+
+/** 出战武器：背包中已拥有的装备/法器里战力最高的一件；无则默认木剑。 */
+export function 出战武器(存档){
+  const 拥有=境界商品.filter(x=>['装备','法器'].includes(x.类别)&&Number(存档?.背包?.[x.编号])>0)
+    .sort((a,b)=>b.战力-a.战力||a.名称.localeCompare(b.名称,'zh'));
+  if(!拥有.length)return {编号:'默认-木剑',名称:'青芒木剑',类别:'法器',战力:10,特效:'木剑',色:'#5eead4'};
+  const 物=拥有[0];
+  return {...物,特效:武器特效键(物),色:武器特效色(物)};
+}
+export function 武器特效键(物){
+  const 名=物?.名称||'',编号=物?.编号||'';
+  if(/护腕|腕/.test(名+编号)||物?.类别==='装备'&&/护腕|衣|袍|甲|袋/.test(名)){
+    if(/护腕|腕/.test(名))return '护腕';
+    if(/衣|袍|甲/.test(名))return '法衣';
+    if(/袋|书袋/.test(名))return '书袋';
+    return '近战';
+  }
+  if(/笔|灵笔/.test(名))return '灵笔';
+  if(/鉴|知微/.test(名))return '知微鉴';
+  if(/镜|灯|钟|铃|珠|尺|印|鼎|环|塔/.test(名))return '镜类';
+  if(/佩|符|砚|盘/.test(名))return '佩符';
+  return 物?.类别==='装备'?'近战':'木剑';
+}
+export function 武器特效色(物){
+  const 键=武器特效键(物);
+  return ({护腕:'#34d399',近战:'#4ade80',法衣:'#38bdf8',书袋:'#a3e635',灵笔:'#60a5fa',知微鉴:'#fbbf24',镜类:'#c084fc',佩符:'#2dd4bf',木剑:'#5eead4'})[键]||'#5eead4';
+}

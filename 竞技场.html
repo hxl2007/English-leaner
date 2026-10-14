@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0b1220">
+  <title>切磋竞技场 · 升本练习室</title>
+  <link rel="icon" href="./学习图标.png" type="image/png">
+  <link rel="stylesheet" href="./竞技场.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="./竞技场.js"></script>
+</head>
+<body>
+  <div id="竞技场根">
+    <canvas id="擂台画布"></canvas>
+    <div id="顶栏HUD">
+      <a class="返回" href="./英语.html#道友/切磋">← 道友</a>
+      <div class="对阵名" id="对阵名">切磋擂台</div>
+      <div class="出战" id="出战兵器">兵器加载中…</div>
+    </div>
+    <div id="血条区">
+      <div class="血条卡 我方">
+        <div class="名" id="我名">我</div>
+        <div class="条"><i id="我血条"></i></div>
+        <div class="数"><span id="我血">100</span> · 连击 <span id="我连">0</span></div>
+      </div>
+      <div class="VS">VS</div>
+      <div class="血条卡 对方">
+        <div class="名" id="他名">对手</div>
+        <div class="条"><i id="他血条"></i></div>
+        <div class="数"><span id="他血">100</span> · 连击 <span id="他连">0</span></div>
+      </div>
+    </div>
+    <div id="特效字" aria-hidden="true"></div>
+    <section id="答题面板" hidden>
+      <div class="题进度" id="题进度">第 1 / 10 题</div>
+      <p class="题干" id="题干" lang="en"></p>
+      <div class="选项列" id="选项列"></div>
+      <p class="提示行" id="提示行">答对发动兵器攻击；连续答对 3 题放大招。</p>
+    </section>
+    <div id="等待层" class="遮罩">
+      <div class="卡">
+        <h1 id="等待标题">正在进入擂台…</h1>
+        <p id="等待说明">同步对局状态</p>
+        <a class="次链" href="./英语.html#道友/切磋">返回道友</a>
+      </div>
+    </div>
+    <div id="结算层" class="遮罩" hidden>
+      <div class="卡 结算卡">
+        <p class="眉">切磋结束</p>
+        <h1 id="结算标题">胜负已分</h1>
+        <p id="结算说明"></p>
+        <div class="按钮行">
+          <a class="主按钮" href="./英语.html#道友/切磋">返回道友</a>
+          <button class="次按钮" id="再看擂台" type="button">继续看擂台</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <noscript>请启用 JavaScript 进入 3D 竞技场。</noscript>
+</body>
+</html>

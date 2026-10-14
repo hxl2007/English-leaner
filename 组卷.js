@@ -176,3 +176,23 @@ export function 验证练习(练习,题库) {
   if(!c.作答||typeof c.作答!=='object'||!Number.isFinite(c.开始时间??c.提交时间))throw new Error('存档进度无效。');
   return c;
 }
+
+// 专业课（高等数学 / C语言）修为与金币同源：满分估算上限，交卷按得分比例结算。
+export function 专业课奖励上限(卷){
+  const 题数=Array.isArray(卷?.题目)?卷.题目.length:Number(卷?.题数)||10;
+  const 满分=Number(卷?.满分)||100;
+  if(typeof 卷?.编号==='string'&&卷.编号.startsWith('数学专项-'))return Math.min(25,Math.max(5,题数));
+  if(卷?.类型==='同型练习')return Math.min(25,Math.max(5,题数));
+  if(卷?.类型==='复习题')return Math.min(40,Math.max(10,Math.round(满分*0.4)));
+  // 原卷转载 / 照片试题 / 官方样题：接近英语整卷上限，按满分缩放
+  return Math.min(100,Math.max(20,Math.round(满分*0.8)));
+}
+export function 专业课奖励金币(卷,分数){
+  const 上限=专业课奖励上限(卷),满分=Math.max(1,Number(卷?.满分)||100);
+  const 分=Math.max(0,Number(分数)||0);
+  return Math.max(0,Math.min(上限,Math.round((分/满分)*上限)));
+}
+export function 专业课预计修为文案(卷){
+  const n=专业课奖励上限(卷);
+  return `完成约 +${n} 修为（满分时；按得分比例结算）`;
+}

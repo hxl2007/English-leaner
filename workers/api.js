@@ -12,7 +12,7 @@ export default {
     try {
       if(!env.DB)return json({error:'请在账户 Worker 绑定 D1：DB = zhuanshengben_users，然后重新部署。'},503,cors);
       await 补齐用户字段(env);
-      if(url.pathname==='/api/health')return json({service:'升本账户服务',version:8,database:true,social:true,grade:true},200,cors);
+      if(url.pathname==='/api/health')return json({service:'升本账户服务',version:9,database:true,social:true,grade:true,arena:true},200,cors);
       const 社交响应=await 社交路由(request,env,cors,url,{鉴权,限流,hash,json});if(社交响应)return 社交响应;
       if(url.pathname==='/api/feedback'&&request.method==='POST')return await 提交反馈(request,env,cors);
       if(url.pathname==='/api/feedback'&&request.method==='GET')return await 读取反馈(request,env,cors);
@@ -413,12 +413,14 @@ async function 补齐社交表(env){
   await env.DB.prepare("CREATE TABLE IF NOT EXISTS 对战 (编号 TEXT PRIMARY KEY, 发起人 TEXT NOT NULL, 对手 TEXT NOT NULL, 模块 TEXT NOT NULL DEFAULT '单选', 题目编号 TEXT NOT NULL, 状态 TEXT NOT NULL DEFAULT '待应战', 发起人分数 INTEGER, 发起人用时 INTEGER, 对手分数 INTEGER, 对手用时 INTEGER, 创建时间 INTEGER NOT NULL, 更新时间 INTEGER NOT NULL)").run();
   await env.DB.prepare('CREATE INDEX IF NOT EXISTS 对战发起人 ON 对战(发起人,创建时间)').run();
   await env.DB.prepare('CREATE INDEX IF NOT EXISTS 对战对手 ON 对战(对手,创建时间)').run();
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS 竞技场 (编号 TEXT PRIMARY KEY, 发起人 TEXT NOT NULL, 对手 TEXT NOT NULL, 题目编号 TEXT NOT NULL, 状态 TEXT NOT NULL DEFAULT '待接受', 发起人血量 INTEGER NOT NULL DEFAULT 100, 对手血量 INTEGER NOT NULL DEFAULT 100, 发起人连击 INTEGER NOT NULL DEFAULT 0, 对手连击 INTEGER NOT NULL DEFAULT 0, 发起人进度 INTEGER NOT NULL DEFAULT 0, 对手进度 INTEGER NOT NULL DEFAULT 0, 发起人武器 TEXT NOT NULL DEFAULT '', 对手武器 TEXT NOT NULL DEFAULT '', 发起人答卷 TEXT NOT NULL DEFAULT '{}', 对手答卷 TEXT NOT NULL DEFAULT '{}', 回合日志 TEXT NOT NULL DEFAULT '[]', 胜者 TEXT, 创建时间 INTEGER NOT NULL, 更新时间 INTEGER NOT NULL)").run();
+  await env.DB.prepare('CREATE INDEX IF NOT EXISTS 竞技场双方 ON 竞技场(发起人,对手,创建时间)').run();
 }
 
 // 返回 null 表示不是社交接口，由主路由继续处理。
 async function 社交路由(request,env,cors,url,工具){
   const 路径=url.pathname,方法=request.method;
-  if(!/^\/api\/(social|friends|leaderboard|pk)$/.test(路径))return null;
+  if(!/^\/api\/(social|friends|leaderboard|pk|arena)$/.test(路径))return null;
   const {json}=工具;
   const 我=await 工具.鉴权(request,env);if(!我)return json({error:'请先登录'},401,cors);
   const 上下文={env,cors,我,url,request,...工具};
@@ -431,6 +433,9 @@ async function 社交路由(request,env,cors,url,工具){
   if(路径==='/api/pk'&&方法==='GET')return 论道列表(上下文);
   if(路径==='/api/pk'&&方法==='POST')return 发起论道(上下文);
   if(路径==='/api/pk'&&方法==='PUT')return 回应论道(上下文);
+  if(路径==='/api/arena'&&方法==='GET')return 竞技场查询(上下文);
+  if(路径==='/api/arena'&&方法==='POST')return 发起切磋(上下文);
+  if(路径==='/api/arena'&&方法==='PUT')return 回应切磋(上下文);
   return json({error:'Not Found'},404,cors);
 }
 
@@ -451,7 +456,9 @@ async function 我的资料({env,cors,我,hash,json}){
   const 行=await 读取资料(env,hash,我);
   const 待处理=await env.DB.prepare("SELECT COUNT(*) AS n FROM 好友关系 WHERE 接收人=? AND 状态='待确认'").bind(我).first();
   const 待应战=await env.DB.prepare("SELECT COUNT(*) AS n FROM 对战 WHERE 对手=? AND 状态='待应战' AND 创建时间>?").bind(我,Date.now()-论道有效期).first();
-  return json({profile:{...公开视图(行,我),手机号:我,公开排行:Number(行.公开排行)===1,允许好友:Number(行.允许好友)===1},待处理好友:Number(待处理?.n)||0,待应战:Number(待应战?.n)||0},200,cors);
+  const 待切磋=await env.DB.prepare("SELECT COUNT(*) AS n FROM 竞技场 WHERE 对手=? AND 状态='待接受' AND 创建时间>?").bind(我,Date.now()-论道有效期).first();
+  const 进行中=await env.DB.prepare("SELECT 编号 FROM 竞技场 WHERE 状态='进行中' AND (发起人=? OR 对手=?) ORDER BY 更新时间 DESC LIMIT 1").bind(我,我).first();
+  return json({profile:{...公开视图(行,我),手机号:我,公开排行:Number(行.公开排行)===1,允许好友:Number(行.允许好友)===1},待处理好友:Number(待处理?.n)||0,待应战:Number(待应战?.n)||0,待切磋:Number(待切磋?.n)||0,进行中竞技场:进行中?.编号||null},200,cors);
 }
 async function 更新资料({env,cors,我,request,hash,json,限流}){
   await 限流(env,'社交更新:'+await hash(我),240);
@@ -627,4 +634,155 @@ async function 回应论道({env,cors,我,request,hash,json}){
   const 新=await env.DB.prepare('SELECT * FROM 对战 WHERE 编号=?').bind(编号).first();
   const 资料=await 载入相关资料(env,hash,[新.发起人,新.对手]);
   return json({success:true,对战:论道视图(新,我,资料)},200,cors);
+}
+
+
+const 切磋题数=10,切磋有效期=论道有效期,基础伤害=12,大招伤害=28;
+
+function 解析武器(文){
+  try{const o=JSON.parse(文||'');return o&&typeof o==='object'?o:{编号:'默认-木剑',名称:'青芒木剑',特效:'木剑',色:'#5eead4',战力:10};}catch{return {编号:'默认-木剑',名称:'青芒木剑',特效:'木剑',色:'#5eead4',战力:10};}
+}
+function 竞技场视图(r,我,资料){
+  const 我是发起人=r.发起人===我;
+  const 人=号=>{const p=资料.get(号);return p?{用户键:p.用户键,名称:p.名称||`学习者${String(号).slice(-4)}`,尾号:String(号).slice(-4)}:{用户键:'',名称:'道友',尾号:String(号).slice(-4)};};
+  let 题目编号=[],回合日志=[],发起人答卷={},对手答卷={};
+  try{题目编号=JSON.parse(r.题目编号);}catch{}
+  try{回合日志=JSON.parse(r.回合日志||'[]');}catch{}
+  try{发起人答卷=JSON.parse(r.发起人答卷||'{}');}catch{}
+  try{对手答卷=JSON.parse(r.对手答卷||'{}');}catch{}
+  return {
+    编号:r.编号,状态:r.状态,我是发起人,题目编号,
+    发起人:人(r.发起人),对手:人(r.对手),
+    我的血量:我是发起人?r.发起人血量:r.对手血量,
+    对方血量:我是发起人?r.对手血量:r.发起人血量,
+    我的连击:我是发起人?r.发起人连击:r.对手连击,
+    对方连击:我是发起人?r.对手连击:r.发起人连击,
+    我的进度:我是发起人?r.发起人进度:r.对手进度,
+    对方进度:我是发起人?r.对手进度:r.发起人进度,
+    我的武器:解析武器(我是发起人?r.发起人武器:r.对手武器),
+    对方武器:解析武器(我是发起人?r.对手武器:r.发起人武器),
+    我的答卷:我是发起人?发起人答卷:对手答卷,
+    回合日志,胜者:r.胜者?人(r.胜者):null,胜者是我:r.胜者===我,我的手机号:我,
+    创建时间:Number(r.创建时间)||0,更新时间:Number(r.更新时间)||0
+  };
+}
+async function 竞技场查询({env,cors,我,url,hash,json}){
+  await 补齐社交表(env);
+  const 编号=url.searchParams.get('id');
+  const 现在=Date.now();
+  await env.DB.prepare("UPDATE 竞技场 SET 状态='已过期',更新时间=? WHERE 状态='待接受' AND 创建时间<? AND (发起人=? OR 对手=?)").bind(现在,现在-切磋有效期,我,我).run();
+  if(编号){
+    const r=await env.DB.prepare('SELECT * FROM 竞技场 WHERE 编号=?').bind(编号).first();
+    if(!r||(r.发起人!==我&&r.对手!==我))return json({error:'对局不存在'},404,cors);
+    const 资料=await 载入相关资料(env,hash,[r.发起人,r.对手]);
+    return json({对局:竞技场视图(r,我,资料)},200,cors);
+  }
+  const 结果=await env.DB.prepare('SELECT * FROM 竞技场 WHERE 发起人=? OR 对手=? ORDER BY 更新时间 DESC LIMIT 40').bind(我,我).all();
+  const 行列表=结果.results||[];
+  const 资料=await 载入相关资料(env,hash,行列表.flatMap(r=>[r.发起人,r.对手]));
+  const 全部=行列表.map(r=>竞技场视图(r,我,资料));
+  return json({
+    待接受:全部.filter(x=>x.状态==='待接受'&&!x.我是发起人),
+    已发出:全部.filter(x=>x.状态==='待接受'&&x.我是发起人),
+    进行中:全部.filter(x=>x.状态==='进行中'),
+    已结束:全部.filter(x=>!['待接受','进行中'].includes(x.状态)).slice(0,20)
+  },200,cors);
+}
+async function 发起切磋({env,cors,我,request,hash,json,限流}){
+  await 补齐社交表(env);
+  await 限流(env,'发起切磋:'+await hash(我),30);
+  const {对手,题目编号,武器}=await request.json();
+  const 用户=await 查找用户(env,对手);
+  if(!用户||用户.手机号===我)return json({error:'请选择一位好友发起切磋'},400,cors);
+  const 好友=await 好友手机号集合(env,我);
+  if(!好友.has(用户.手机号))return json({error:'只能与好友切磋'},403,cors);
+  if(!Array.isArray(题目编号)||题目编号.length!==切磋题数||new Set(题目编号).size!==切磋题数||!题目编号.every(x=>typeof x==='string'&&x.length>0&&x.length<=60))return json({error:`题目编号需为 ${切磋题数} 道不重复的题`},400,cors);
+  const 武=武器&&typeof 武器==='object'?{编号:String(武器.编号||'').slice(0,40),名称:String(武器.名称||'青芒木剑').slice(0,40),特效:String(武器.特效||'木剑').slice(0,20),色:String(武器.色||'#5eead4').slice(0,20),战力:Math.min(2000,Math.max(0,Number(武器.战力)||10))}:{编号:'默认-木剑',名称:'青芒木剑',特效:'木剑',色:'#5eead4',战力:10};
+  const 现在=Date.now();
+  const 进行中=await env.DB.prepare("SELECT 编号 FROM 竞技场 WHERE 状态 IN ('待接受','进行中') AND ((发起人=? AND 对手=?) OR (发起人=? AND 对手=?)) AND 创建时间>?").bind(我,用户.手机号,用户.手机号,我,现在-切磋有效期).first();
+  if(进行中)return json({error:'你们已有一局未完成的切磋'},409,cors);
+  const 编号=crypto.randomUUID();
+  await env.DB.prepare("INSERT INTO 竞技场 (编号,发起人,对手,题目编号,状态,发起人武器,创建时间,更新时间) VALUES (?,?,?,?,'待接受',?,?,?)").bind(编号,我,用户.手机号,JSON.stringify(题目编号),JSON.stringify(武),现在,现在).run();
+  return json({success:true,编号,状态:'待接受'},200,cors);
+}
+async function 回应切磋({env,cors,我,request,hash,json,限流}){
+  await 补齐社交表(env);
+  const 体=await request.json();
+  const {编号,动作}=体;
+  if(typeof 编号!=='string'||!['接受','拒绝','答题','放弃'].includes(动作))return json({error:'参数无效'},400,cors);
+  const r=await env.DB.prepare('SELECT * FROM 竞技场 WHERE 编号=?').bind(编号).first();
+  if(!r||(r.发起人!==我&&r.对手!==我))return json({error:'对局不存在'},404,cors);
+  const 现在=Date.now();
+  const 资料=await 载入相关资料(env,hash,[r.发起人,r.对手]);
+
+  if(动作==='拒绝'){
+    if(r.对手!==我||r.状态!=='待接受')return json({error:'只能拒绝发给你的切磋邀请'},400,cors);
+    await env.DB.prepare("UPDATE 竞技场 SET 状态='已拒绝',更新时间=? WHERE 编号=? AND 状态='待接受'").bind(现在,编号).run();
+    return json({success:true},200,cors);
+  }
+  if(动作==='放弃'){
+    if(r.状态!=='进行中'&&r.状态!=='待接受')return json({error:'对局已结束'},409,cors);
+    const 胜者=r.发起人===我?r.对手:r.发起人;
+    await env.DB.prepare("UPDATE 竞技场 SET 状态='已结束',胜者=?,更新时间=? WHERE 编号=?").bind(胜者,现在,编号).run();
+    const 新=await env.DB.prepare('SELECT * FROM 竞技场 WHERE 编号=?').bind(编号).first();
+    return json({success:true,对局:竞技场视图(新,我,资料)},200,cors);
+  }
+  if(动作==='接受'){
+    if(r.对手!==我||r.状态!=='待接受')return json({error:'只能接受发给你的切磋邀请'},400,cors);
+    if(r.创建时间<现在-切磋有效期)return json({error:'邀请已过期'},409,cors);
+    const 武=体.武器&&typeof 体.武器==='object'?{编号:String(体.武器.编号||'').slice(0,40),名称:String(体.武器.名称||'青芒木剑').slice(0,40),特效:String(体.武器.特效||'木剑').slice(0,20),色:String(体.武器.色||'#5eead4').slice(0,20),战力:Math.min(2000,Math.max(0,Number(体.武器.战力)||10))}:{编号:'默认-木剑',名称:'青芒木剑',特效:'木剑',色:'#5eead4',战力:10};
+    const 写入=await env.DB.prepare("UPDATE 竞技场 SET 状态='进行中',对手武器=?,更新时间=? WHERE 编号=? AND 状态='待接受'").bind(JSON.stringify(武),现在,编号).run();
+    if(!写入.meta?.changes)return json({error:'邀请已被处理'},409,cors);
+    const 新=await env.DB.prepare('SELECT * FROM 竞技场 WHERE 编号=?').bind(编号).first();
+    return json({success:true,对局:竞技场视图(新,我,资料),跳转:true},200,cors);
+  }
+  // 答题
+  await 限流(env,'切磋答题:'+await hash(我),120);
+  if(r.状态!=='进行中')return json({error:'对局未在进行中'},409,cors);
+  let 题目编号=[];try{题目编号=JSON.parse(r.题目编号);}catch{}
+  const 题号=体.题目编号,选项=体.选项,正确=!!体.正确;
+  if(typeof 题号!=='string'||!题目编号.includes(题号)||!/^[ABCD]$/.test(选项||''))return json({error:'答题参数无效'},400,cors);
+  const 我是发起人=r.发起人===我;
+  let 我答={};try{我答=JSON.parse(我是发起人?r.发起人答卷:r.对手答卷||'{}');}catch{}
+  if(我答[题号])return json({error:'这道题已经答过'},409,cors);
+  我答[题号]=选项;
+  let 日志=[];try{日志=JSON.parse(r.回合日志||'[]');}catch{}
+  let 我血=我是发起人?r.发起人血量:r.对手血量;
+  let 他血=我是发起人?r.对手血量:r.发起人血量;
+  let 连击=我是发起人?r.发起人连击:r.对手连击;
+  let 进度=我是发起人?r.发起人进度:r.对手进度;
+  const 武=解析武器(我是发起人?r.发起人武器:r.对手武器);
+  let 事件=null;
+  if(正确){
+    连击+=1;进度+=1;
+    const 大招=连击>=3;
+    const 伤=Math.min(45,Math.round((大招?大招伤害:基础伤害)*(1+(武.战力||10)/800)));
+    他血=Math.max(0,他血-伤);
+    if(大招)连击=0;
+    事件={类型:大招?'大招':'攻击',谁:我,正确:true,伤害:伤,特效:武.特效,色:武.色,武器:武.名称,连击:大招?3:连击,时间:现在,题号};
+  }else{
+    连击=0;进度+=1;
+    事件={类型:'失手',谁:我,正确:false,伤害:0,特效:武.特效,色:武.色,武器:武.名称,连击:0,时间:现在,题号};
+  }
+  日志.push(事件);
+  let 状态='进行中',胜者=null;
+  if(他血<=0){状态='已结束';胜者=我;}
+  else if(Object.keys(我答).length>=切磋题数){
+    // 等双方答完或一方血空
+    const 他答={};try{Object.assign(他答,JSON.parse(我是发起人?r.对手答卷:r.发起人答卷||'{}'));}catch{}
+    if(Object.keys(他答).length>=切磋题数){
+      状态='已结束';
+      if(我血>他血)胜者=我;else if(他血>我血)胜者=我是发起人?r.对手:r.发起人;
+      else 胜者=null; // 平局
+    }
+  }
+  const 答卷字段=我是发起人?'发起人答卷':'对手答卷';
+  const 血我字段=我是发起人?'发起人血量':'对手血量';
+  const 血他字段=我是发起人?'对手血量':'发起人血量';
+  const 连字段=我是发起人?'发起人连击':'对手连击';
+  const 进度字段=我是发起人?'发起人进度':'对手进度';
+  await env.DB.prepare(`UPDATE 竞技场 SET ${答卷字段}=?,${血我字段}=?,${血他字段}=?,${连字段}=?,${进度字段}=?,回合日志=?,状态=?,胜者=?,更新时间=? WHERE 编号=? AND 状态='进行中'`)
+    .bind(JSON.stringify(我答),我血,他血,连击,进度,JSON.stringify(日志),状态,胜者,现在,编号).run();
+  const 新=await env.DB.prepare('SELECT * FROM 竞技场 WHERE 编号=?').bind(编号).first();
+  return json({success:true,事件,对局:竞技场视图(新,我,资料)},200,cors);
 }
