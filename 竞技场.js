@@ -23,6 +23,7 @@ let 粒子组=[],震动=0,闪白=0,创伤=0;
 const 减动=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const 手机=matchMedia('(max-width:640px)').matches||navigator.maxTouchPoints>1;
 const 粒子上限=减动?12:(手机?28:48);
+const 动画表=new WeakMap(); // 角色 -> {name,t,dur,向右,hitAt}
 
 if(演示模式){启动演示();}
 else if(!对局编号){显示等待('缺少对局编号','请从道友页发起或接受切磋。');}
@@ -53,7 +54,7 @@ function 启动演示(){
     i++;
   };
   播();
-  setInterval(播, 2400);
+  setInterval(播, 3000);
   window.__vfxIndex=()=>i;
 }
 
@@ -141,54 +142,279 @@ function 触发特效(ev,从左打右){
   const 受=从左打右?对方角色:我方角色;
   if(!攻||!受)return;
   const 类型=ev.特效||'木剑';
-  // 攻击姿势短暂前倾
-  挥砍姿势(攻,从左打右);
+
   if(ev.类型==='大招'){
+    播角色动画(攻,'ultimate',{向右:从左打右});
+    播角色动画(受,'hit',{向右:!从左打右,延迟:0.58});
     放字(ev.武器+' · 大招！', ev.色||'#fbbf24');
-    喷粒子(受.position,色,减动?14:粒子上限,2.2);
-    斩击弧(攻.position,受.position,色,true);
-    冲击波环(受.position,色,1.6);
-    命中火花(受.position,色,减动?10:22);
-    残影(攻,色);
-    震动=减动?0.1:0.32;闪白=0.75;创伤=Math.min(1,创伤+0.85);
-    if(bloomPass)bloomPass.strength=减动?0.55:1.35;
+    // 蓄力阶段：剑身加辉 + 轻微粒子
+    蓄力辉光(攻,色,0.55);
+    setTimeout(()=>{
+      喷粒子(受.position,色,减动?14:粒子上限,2.6);
+      斩击弧(攻.position,受.position,色,true);
+      冲击波环(受.position,色,2.1);
+      冲击波环(受.position,色,1.2);
+      地面裂痕(受.position,色,1.8);
+      命中火花(受.position,色,减动?12:28);
+      残影(攻,色);
+      全屏闪(ev.色||'#fbbf24',0.55);
+      震动=减动?0.12:0.42;闪白=1.0;创伤=Math.min(1,创伤+0.95);
+      if(bloomPass)bloomPass.strength=减动?0.7:1.85;
+    },减动?80:580);
   }else if(ev.类型==='攻击'){
+    播角色动画(攻,'attack',{向右:从左打右});
+    播角色动画(受,'hit',{向右:!从左打右,延迟:0.30});
     放字((ev.伤害||0)+' !', ev.色||'#5eead4');
-    喷粒子(受.position,色,减动?8:Math.min(粒子上限,28),1.25);
-    按武器特效(类型,攻.position,受.position,色);
-    命中火花(受.position,色,减动?6:14);
-    震动=减动?0.05:0.16;闪白=0.32;创伤=Math.min(1,创伤+0.35);
+    setTimeout(()=>{
+      喷粒子(受.position,色,减动?8:Math.min(粒子上限,32),1.45);
+      按武器特效(类型,攻.position,受.position,色);
+      命中火花(受.position,色,减动?8:18);
+      地面裂痕(受.position,色,0.85);
+      震动=减动?0.06:0.2;闪白=0.42;创伤=Math.min(1,创伤+0.42);
+      if(bloomPass)bloomPass.strength=Math.max(bloomPass.strength,减动?0.5:1.05);
+    },减动?40:300);
   }else{
     放字('失手', '#94a3b8');
+    播角色动画(攻,'miss',{向右:从左打右});
   }
-  // 受击闪色
-  受.traverse(o=>{
-    if(o.isMesh&&o.material?.emissive){
-      o.userData._em=o.material.emissive.clone();
-      o.userData._emi=o.material.emissiveIntensity??0.12;
-      o.material.emissive.set(色);
-      o.material.emissiveIntensity=0.95;
-      setTimeout(()=>{
-        if(o.userData._em){
-          o.material.emissive.copy(o.userData._em);
-          o.material.emissiveIntensity=o.userData._emi;
-        }
-      },260);
-    }
-  });
-  // 受击轻后仰
-  const 基=受.userData.基旋Y??受.rotation.y;
-  受.rotation.x=-0.12;
-  setTimeout(()=>{受.rotation.x=0;},280);
 }
 
-function 挥砍姿势(角色,向右){
-  const 剑=角色.userData.剑;
-  if(!剑)return;
-  const 目标Z=向右?-1.05:1.05;
-  剑.rotation.z=目标Z;
-  剑.rotation.x=-0.35;
-  setTimeout(()=>{剑.rotation.z=角色.userData.剑闲置Z??-0.55;剑.rotation.x=0;},320);
+/** 关键帧动作：idle / attack / hit / ultimate / miss */
+function 播角色动画(角色,name,opts={}){
+  if(!角色)return;
+  const 向右=opts.向右??true;
+  const 延迟=opts.延迟||0;
+  const dur={attack:0.55,hit:0.42,ultimate:1.05,miss:0.35,idle:0}[name]||0.5;
+  const start=()=>{
+    动画表.set(角色,{
+      name,t:0,dur,
+      向右,
+      homeX:角色.userData.homeX??角色.position.x,
+      homeZ:角色.userData.homeZ??角色.position.z,
+      基旋Y:角色.userData.基旋Y??角色.rotation.y,
+      剑闲置Z:角色.userData.剑闲置Z??-0.55
+    });
+  };
+  if(延迟>0) setTimeout(start,延迟*1000);
+  else start();
+}
+
+function 蓄力辉光(角色,色,秒){
+  const 剑=角色.userData.剑;if(!剑)return;
+  剑.traverse(o=>{
+    if(o.isMesh&&o.material?.emissive){
+      o.userData._em2=o.material.emissive.clone();
+      o.userData._emi2=o.material.emissiveIntensity??0.2;
+      o.material.emissive.copy(色);
+      o.material.emissiveIntensity=1.4;
+    }
+  });
+  setTimeout(()=>{
+    剑.traverse(o=>{
+      if(o.isMesh&&o.userData._em2){
+        o.material.emissive.copy(o.userData._em2);
+        o.material.emissiveIntensity=o.userData._emi2;
+      }
+    });
+  },秒*1000);
+}
+
+function easeOutCubic(x){return 1-Math.pow(1-x,3);}
+function easeInOut(x){return x<0.5?2*x*x:1-Math.pow(-2*x+2,2)/2;}
+function smoothstep(a,b,x){const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t);}
+
+function 更新角色动作(角,dt,wallT){
+  if(!角)return;
+  const ph=角.userData.呼吸相位||0;
+  const homeX=角.userData.homeX??角.position.x;
+  const homeZ=角.userData.homeZ??角.position.z;
+  const 基旋Y=角.userData.基旋Y??0;
+  const 剑=角.userData.剑;
+  const 剑闲置Z=角.userData.剑闲置Z??-0.55;
+  const anim=动画表.get(角);
+
+  // —— 关键帧覆盖 ——
+  if(anim && anim.name!=='idle'){
+    anim.t+=dt;
+    const u=Math.min(1,anim.t/anim.dur);
+    const dir=anim.向右?1:-1;
+
+    if(anim.name==='attack'){
+      // 0–0.28 蓄势后拉 / 转体；0.28–0.55 挥砍前冲；0.55–1 回收
+      const wind=smoothstep(0,0.28,u);
+      const slash=smoothstep(0.28,0.58,u);
+      const rec=smoothstep(0.58,1,u);
+      const lean=wind*0.22 - slash*0.08 + rec*0.0;
+      角.rotation.y=基旋Y + dir*(-0.35*wind + 0.55*slash - 0.15*rec);
+      角.rotation.z=dir*(0.08*wind - 0.12*slash);
+      角.rotation.x=-0.06*wind + 0.04*slash;
+      角.position.x=homeX + dir*( -0.12*wind + 0.85*easeOutCubic(slash) - 0.55*rec*slash );
+      角.position.z=homeZ;
+      if(剑){
+        剑.rotation.z=剑闲置Z + dir*(0.9*wind - 1.85*slash + 0.4*rec);
+        剑.rotation.x=-0.55*wind + 0.95*slash - 0.2*rec;
+        剑.rotation.y=dir*(0.25*slash);
+        剑.position.y=1.15 + 0.25*wind - 0.15*slash;
+      }
+      // 持剑臂抬起
+      if(角.userData.臂){
+        for(const a of 角.userData.臂){
+          if(a.s===dir||(anim.向右&&a.s===1)||(!anim.向右&&a.s===-1)){
+            a.上臂.rotation.z=(0.55*a.s) - a.s*(0.4*wind - 0.7*slash);
+            a.前臂.rotation.z=(0.35*a.s) - a.s*(0.5*slash);
+          }
+        }
+      }
+    }else if(anim.name==='ultimate'){
+      // 0–0.38 举剑蓄力；0.38–0.55 停顿；0.55–0.78 下劈前冲；0.78–1 回收
+      const raise=smoothstep(0,0.38,u);
+      const hold=smoothstep(0.38,0.55,u);
+      const slam=smoothstep(0.55,0.78,u);
+      const rec=smoothstep(0.78,1,u);
+      角.rotation.y=基旋Y + dir*(-0.2*raise + 0.7*slam);
+      角.rotation.x=-0.15*raise + 0.25*slam - 0.05*rec;
+      角.rotation.z=dir*(0.1*raise - 0.18*slam);
+      角.position.x=homeX + dir*(-0.2*raise + 1.15*easeOutCubic(slam) - 0.7*rec);
+      角.position.y=Math.sin(raise*Math.PI)*0.08 + (1-slam)*0.0;
+      if(剑){
+        剑.rotation.z=剑闲置Z + dir*(1.35*raise - 2.4*slam + 0.5*rec);
+        剑.rotation.x=-1.15*raise - 0.1*hold + 1.45*slam;
+        剑.position.y=1.15 + 0.85*raise - 0.9*slam;
+      }
+      if(角.userData.臂){
+        for(const a of 角.userData.臂){
+          a.上臂.rotation.z=(0.55*a.s) - a.s*(0.85*raise - 1.1*slam);
+          a.前臂.rotation.z=(0.35*a.s) - a.s*(0.6*raise);
+        }
+      }
+      // 蓄力时脚下淡环
+      if(raise>0.2 && raise<0.95 && Math.random()<0.15 && !减动){
+        冲击波环(角.position,new THREE.Color(角.userData.主色||0x14b8a6),0.35+raise*0.4);
+      }
+    }else if(anim.name==='hit'){
+      const k=Math.sin(Math.min(1,u)*Math.PI); // 起落
+      角.rotation.x=-0.28*k;
+      角.rotation.z=dir*(-0.12*k);
+      角.position.x=homeX - dir*0.35*easeOutCubic(Math.min(1,u*1.4));
+      角.position.y=0.05*k;
+      // 受击闪红
+      if(u<0.08){
+        角.traverse(o=>{
+          if(o.isMesh&&o.material?.emissive&&!o.userData._hitFlash){
+            o.userData._hitFlash=true;
+            o.userData._em=o.material.emissive.clone();
+            o.userData._emi=o.material.emissiveIntensity??0.12;
+            o.material.emissive.set(0xff2244);
+            o.material.emissiveIntensity=1.1;
+          }
+        });
+      }
+      if(u>0.7){
+        角.traverse(o=>{
+          if(o.isMesh&&o.userData._hitFlash){
+            o.material.emissive.copy(o.userData._em);
+            o.material.emissiveIntensity=o.userData._emi;
+            o.userData._hitFlash=false;
+          }
+        });
+      }
+    }else if(anim.name==='miss'){
+      const k=Math.sin(u*Math.PI);
+      角.rotation.y=基旋Y + dir*(-0.2*k);
+      if(剑){剑.rotation.z=剑闲置Z + dir*0.5*k;剑.rotation.x=-0.3*k;}
+    }
+
+    if(u>=1){
+      // 复位
+      角.rotation.x=0;角.rotation.z=0;角.rotation.y=基旋Y;
+      角.position.x=homeX;角.position.z=homeZ;角.position.y=0;
+      if(剑){剑.rotation.z=剑闲置Z;剑.rotation.x=0;剑.rotation.y=0;剑.position.y=1.15;}
+      if(角.userData.臂){
+        for(const a of 角.userData.臂){
+          a.上臂.rotation.z=0.55*a.s;
+          a.前臂.rotation.z=0.35*a.s;
+        }
+      }
+      角.traverse(o=>{
+        if(o.isMesh&&o.userData._hitFlash){
+          o.material.emissive.copy(o.userData._em);
+          o.material.emissiveIntensity=o.userData._emi;
+          o.userData._hitFlash=false;
+        }
+      });
+      动画表.set(角,{name:'idle',t:0,dur:0});
+    }
+    return; // 动作中跳过待机叠加
+  }
+
+  // —— 更自然的待机：重心左右微移 + 呼吸 + 持剑轻晃 ——
+  const shift=Math.sin(wallT*1.15+ph)*0.045;
+  const breath=Math.sin(wallT*2.0+ph)*0.028;
+  角.rotation.z=shift;
+  角.rotation.y=基旋Y + Math.sin(wallT*0.7+ph)*0.03;
+  角.position.x=homeX + Math.sin(wallT*0.9+ph)*0.025;
+  角.position.y=breath;
+  角.scale.y=1+breath*0.4;
+  角.scale.x=1-breath*0.14;
+  角.scale.z=1-breath*0.14;
+  if(剑){
+    剑.rotation.z=剑闲置Z+Math.sin(wallT*2.4+ph)*0.08;
+    剑.rotation.x=Math.sin(wallT*1.7+ph)*0.05;
+    剑.position.y=1.15+Math.sin(wallT*2.0+ph)*0.02;
+  }
+  if(角.userData.发带){
+    for(const b of 角.userData.发带){
+      b.rotation.x=Math.sin(wallT*3.2+ph)*0.18;
+    }
+  }
+  // 腿部轻微重心（若有 thigh 存在于臂之外，用整体 tilt 已够）
+}
+
+function 全屏闪(色,强度=0.45){
+  const el=document.getElementById('全屏闪');
+  if(!el)return;
+  el.style.background=色;
+  el.style.opacity=String(Math.min(0.85,强度));
+  el.classList.add('显');
+  clearTimeout(全屏闪._t);
+  全屏闪._t=setTimeout(()=>{el.classList.remove('显');el.style.opacity='0';},280);
+}
+
+function 地面裂痕(pos,色,尺度=1){
+  // 地面光环
+  const ring=new THREE.Mesh(
+    new THREE.RingGeometry(0.15*尺度,0.55*尺度,32),
+    new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.9,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide})
+  );
+  ring.position.set(pos.x,0.40,pos.z);
+  ring.rotation.x=-Math.PI/2;
+  场景.add(ring);
+  粒子组.push({mesh:ring,life:0.7,fade:true,expand:2.4*尺度});
+  // 放射裂痕短条
+  const n=减动?4:(手机?6:10);
+  for(let i=0;i<n;i++){
+    const a=(i/n)*Math.PI*2+Math.random()*0.2;
+    const len=(0.5+Math.random()*0.7)*尺度;
+    const bar=new THREE.Mesh(
+      new THREE.PlaneGeometry(0.06,len),
+      new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.8,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide})
+    );
+    bar.position.set(pos.x+Math.cos(a)*0.35*尺度,0.41,pos.z+Math.sin(a)*0.35*尺度);
+    bar.rotation.x=-Math.PI/2;
+    bar.rotation.z=a;
+    场景.add(bar);
+    粒子组.push({mesh:bar,life:0.55+Math.random()*0.2,fade:true});
+  }
+  // 二次外扩暗环
+  if(!减动){
+    const outer=new THREE.Mesh(
+      new THREE.TorusGeometry(0.4*尺度,0.03,6,40),
+      new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.7,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    outer.position.set(pos.x,0.42,pos.z);outer.rotation.x=Math.PI/2;
+    场景.add(outer);
+    粒子组.push({mesh:outer,life:0.6,fade:true,expand:3.2*尺度});
+  }
 }
 
 function 按武器特效(类型,from,to,色){
@@ -325,12 +551,16 @@ function 初始化场景(){
   我方角色=造武侠角色({主色:0x14b8a6,袍色:0x0f766e,里色:0x134e4a,发色:0x1e293b,向右:true});
   我方角色.position.set(-2.55,0,0);
   我方角色.userData.基旋Y=0;
+  我方角色.userData.homeX=-2.55;我方角色.userData.homeZ=0;
+  动画表.set(我方角色,{name:'idle',t:0,dur:0});
   场景.add(我方角色);
 
   对方角色=造武侠角色({主色:0xf43f5e,袍色:0x9f1239,里色:0x4c0519,发色:0x1c1917,向右:false});
   对方角色.position.set(2.55,0,0);
   对方角色.rotation.y=Math.PI;
   对方角色.userData.基旋Y=Math.PI;
+  对方角色.userData.homeX=2.55;对方角色.userData.homeZ=0;
+  动画表.set(对方角色,{name:'idle',t:0,dur:0});
   场景.add(对方角色);
 
   // 后处理 Bloom（CDN three/addons）
@@ -339,9 +569,9 @@ function 初始化场景(){
     合成器.addPass(new RenderPass(场景,相机));
     bloomPass=new UnrealBloomPass(
       new THREE.Vector2(innerWidth,innerHeight),
-      减动?0.35:(手机?0.55:0.72), // strength
-      0.42, // radius
-      0.82  // threshold — 只让高亮刀光/粒子 bloom
+      减动?0.4:(手机?0.68:0.92), // strength — 默认更亮
+      0.5, // radius
+      0.72  // threshold — 更多高光进入 bloom
     );
     合成器.addPass(bloomPass);
     合成器.addPass(new OutputPass());
@@ -567,11 +797,11 @@ function 喷粒子(pos,色,数量,速度){
   }
   geo.setAttribute('position',new THREE.BufferAttribute(posArr,3));
   const mat=new THREE.PointsMaterial({
-    color:色,size:减动?0.1:0.16,transparent:true,opacity:0.95,
+    color:色,size:减动?0.12:0.2,transparent:true,opacity:1,
     depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true
   });
   const pts=new THREE.Points(geo,mat);场景.add(pts);
-  粒子组.push({pts,vel,life:0.75});
+  粒子组.push({pts,vel,life:0.95});
 }
 
 function 命中火花(pos,色,数量){
@@ -586,21 +816,31 @@ function 命中火花(pos,色,数量){
   }
   geo.setAttribute('position',new THREE.BufferAttribute(arr,3));
   const mat=new THREE.PointsMaterial({
-    color:色,size:减动?0.08:0.12,transparent:true,opacity:1,
+    color:色,size:减动?0.1:0.16,transparent:true,opacity:1,
     depthWrite:false,blending:THREE.AdditiveBlending
   });
   const pts=new THREE.Points(geo,mat);场景.add(pts);
-  粒子组.push({pts,vel,life:0.45,gravity:5});
+  粒子组.push({pts,vel,life:0.6,gravity:6});
 }
 
 function 冲击波环(pos,色,尺度=1){
   const ring=new THREE.Mesh(
-    new THREE.TorusGeometry(0.35*尺度,0.045,8,48),
-    new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.85,blending:THREE.AdditiveBlending,depthWrite:false})
+    new THREE.TorusGeometry(0.32*尺度,0.07,10,56),
+    new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:1,blending:THREE.AdditiveBlending,depthWrite:false})
   );
-  ring.position.copy(pos);ring.position.y+=1.25;ring.rotation.x=Math.PI/2;
+  ring.position.copy(pos);ring.position.y+=1.2;ring.rotation.x=Math.PI/2;
   场景.add(ring);
-  粒子组.push({mesh:ring,life:0.55,fade:true,expand:2.8*尺度});
+  粒子组.push({mesh:ring,life:0.7,fade:true,expand:3.6*尺度});
+  // 内亮核
+  if(!减动){
+    const core=new THREE.Mesh(
+      new THREE.SphereGeometry(0.18*尺度,12,12),
+      new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.85,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    core.position.copy(pos);core.position.y+=1.25;
+    场景.add(core);
+    粒子组.push({mesh:core,life:0.28,fade:true,expand:2.8});
+  }
 }
 
 function 残影(角色,色){
@@ -620,70 +860,86 @@ function 残影(角色,色){
 }
 
 function 斩击弧(from,to,色,大){
-  const midY=大?3.4:2.5;
+  const midY=大?3.8:2.7;
   const curve=new THREE.QuadraticBezierCurve3(
-    from.clone().add(new THREE.Vector3(0,1.55,0.2)),
-    new THREE.Vector3((from.x+to.x)/2,midY,大?1.6:1.0),
-    to.clone().add(new THREE.Vector3(0,1.35,0.1))
+    from.clone().add(new THREE.Vector3(0,1.55,0.25)),
+    new THREE.Vector3((from.x+to.x)/2,midY,大?2.0:1.25),
+    to.clone().add(new THREE.Vector3(0,1.35,0.12))
   );
-  // 主刃光
+  // 主刃光 — 更粗更亮
   const tube=new THREE.Mesh(
-    new THREE.TubeGeometry(curve,大?28:18,大?0.16:0.07,8,false),
-    new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.9,blending:THREE.AdditiveBlending,depthWrite:false})
+    new THREE.TubeGeometry(curve,大?36:22,大?0.22:0.1,10,false),
+    new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:1,blending:THREE.AdditiveBlending,depthWrite:false})
   );
   场景.add(tube);
-  粒子组.push({mesh:tube,life:大?0.65:0.38,fade:true});
-  // 拖尾细管
+  粒子组.push({mesh:tube,life:大?0.85:0.5,fade:true});
+  // 加长拖尾（双层）
   if(!减动){
     const trail=new THREE.Mesh(
-      new THREE.TubeGeometry(curve,大?24:14,大?0.28:0.14,6,false),
-      new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.35,blending:THREE.AdditiveBlending,depthWrite:false})
+      new THREE.TubeGeometry(curve,大?32:18,大?0.42:0.22,8,false),
+      new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.42,blending:THREE.AdditiveBlending,depthWrite:false})
     );
     场景.add(trail);
-    粒子组.push({mesh:trail,life:大?0.5:0.28,fade:true});
+    粒子组.push({mesh:trail,life:大?0.7:0.42,fade:true});
+    const trail2=new THREE.Mesh(
+      new THREE.TubeGeometry(curve,大?28:14,大?0.6:0.32,6,false),
+      new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.18,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    场景.add(trail2);
+    粒子组.push({mesh:trail2,life:大?0.55:0.32,fade:true});
   }
   if(大){
-    冲击波环(to,色,1.2);
-    冲击波环(to,色,1.9);
+    冲击波环(to,色,1.35);
+    冲击波环(to,色,2.2);
   }
 }
 
 function 近战斩击(from,to,色){
-  // 短弧 + 冲击
   const curve=new THREE.QuadraticBezierCurve3(
     from.clone().add(new THREE.Vector3(0.3,1.4,0.3)),
-    new THREE.Vector3((from.x+to.x)/2,2.0,0.8),
+    new THREE.Vector3((from.x+to.x)/2,2.15,1.0),
     to.clone().add(new THREE.Vector3(0,1.3,0))
   );
   const tube=new THREE.Mesh(
-    new THREE.TubeGeometry(curve,12,0.09,8,false),
-    new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.88,blending:THREE.AdditiveBlending,depthWrite:false})
+    new THREE.TubeGeometry(curve,16,0.12,8,false),
+    new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:1,blending:THREE.AdditiveBlending,depthWrite:false})
   );
   场景.add(tube);
-  粒子组.push({mesh:tube,life:0.32,fade:true});
-  冲击波环(to,色,0.7);
-  喷粒子(to,色,减动?8:16,1.5);
+  粒子组.push({mesh:tube,life:0.45,fade:true});
+  if(!减动){
+    const trail=new THREE.Mesh(
+      new THREE.TubeGeometry(curve,14,0.26,6,false),
+      new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.35,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    场景.add(trail);粒子组.push({mesh:trail,life:0.38,fade:true});
+  }
+  冲击波环(to,色,0.95);
+  喷粒子(to,色,减动?8:18,1.7);
 }
 
 function 剑气(from,to,色){
   const dir=to.clone().sub(from);const len=dir.length();dir.normalize();
-  // 主束
-  const geo=new THREE.CylinderGeometry(0.06,0.02,len,8);
-  const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.92,blending:THREE.AdditiveBlending,depthWrite:false}));
+  const geo=new THREE.CylinderGeometry(0.08,0.025,len,10);
+  const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:1,blending:THREE.AdditiveBlending,depthWrite:false}));
   mesh.position.copy(from).add(to).multiplyScalar(0.5);mesh.position.y+=1.35;
   mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir);
-  场景.add(mesh);粒子组.push({mesh,life:0.42,fade:true});
-  // 外层拖尾
+  场景.add(mesh);粒子组.push({mesh,life:0.55,fade:true});
   if(!减动){
     const outer=new THREE.Mesh(
-      new THREE.CylinderGeometry(0.14,0.04,len*0.95,8),
-      new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.28,blending:THREE.AdditiveBlending,depthWrite:false})
+      new THREE.CylinderGeometry(0.2,0.06,len*0.98,10),
+      new THREE.MeshBasicMaterial({color:色,transparent:true,opacity:0.38,blending:THREE.AdditiveBlending,depthWrite:false})
     );
     outer.position.copy(mesh.position);outer.quaternion.copy(mesh.quaternion);
-    场景.add(outer);粒子组.push({mesh:outer,life:0.35,fade:true});
+    场景.add(outer);粒子组.push({mesh:outer,life:0.48,fade:true});
+    const glow=new THREE.Mesh(
+      new THREE.CylinderGeometry(0.32,0.1,len*0.9,8),
+      new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.12,blending:THREE.AdditiveBlending,depthWrite:false})
+    );
+    glow.position.copy(mesh.position);glow.quaternion.copy(mesh.quaternion);
+    场景.add(glow);粒子组.push({mesh:glow,life:0.4,fade:true});
   }
-  喷粒子(to,色,减动?10:20,1.35);
-  冲击波环(to,色,0.55);
+  喷粒子(to,色,减动?10:22,1.55);
+  冲击波环(to,色,0.75);
 }
 
 function 光刃(from,to,色){
@@ -731,26 +987,9 @@ function 动画循环(){
   const dt=Math.min(0.05,时钟.getDelta());
   const t=时钟.elapsedTime;
 
-  // 待机呼吸 / 持剑晃动 / 发带轻摆
-  for(const 角 of [我方角色,对方角色]){
-    if(!角)continue;
-    const ph=角.userData.呼吸相位||0;
-    const breath=Math.sin(t*2.1+ph)*0.035;
-    角.position.y=breath;
-    角.scale.y=1+breath*0.35;
-    角.scale.x=1-breath*0.12;
-    角.scale.z=1-breath*0.12;
-    if(角.userData.剑){
-      const idle=角.userData.剑闲置Z??-0.55;
-      角.userData.剑.rotation.z=idle+Math.sin(t*2.6+ph)*0.07;
-      角.userData.剑.rotation.x=Math.sin(t*1.8+ph)*0.04;
-    }
-    if(角.userData.发带){
-      for(const b of 角.userData.发带){
-        b.rotation.x=Math.sin(t*3+ph)*0.15;
-      }
-    }
-  }
+  // 关键帧动作 / 自然待机
+  更新角色动作(我方角色,dt,t);
+  更新角色动作(对方角色,dt,t);
 
   // 粒子 / 特效寿命
   for(let i=粒子组.length-1;i>=0;i--){
@@ -810,12 +1049,12 @@ function 动画循环(){
   // 曝光闪白 + bloom 回落
   if(闪白>0){
     闪白=Math.max(0,闪白-dt*1.6);
-    渲染器.toneMappingExposure=1.05+闪白*1.6;
+    渲染器.toneMappingExposure=1.05+闪白*2.2;
   }else{
     渲染器.toneMappingExposure=THREE.MathUtils.lerp(渲染器.toneMappingExposure,1.05,0.08);
   }
   if(bloomPass){
-    const 目标=减动?0.35:(手机?0.55:0.72);
+    const 目标=减动?0.4:(手机?0.68:0.92);
     bloomPass.strength=THREE.MathUtils.lerp(bloomPass.strength,目标,0.06);
   }
 

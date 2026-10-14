@@ -42,3 +42,7 @@ html,body{margin:0;height:100%;background:#070b14;color:#e2e8f0;font-family:syst
 .次按钮{background:rgba(148,163,184,.15);color:#e2e8f0;border:1px solid rgba(148,163,184,.3)}
 @media(max-width:640px){.选项列{grid-template-columns:1fr}#血条区{top:52px}}
 @media(prefers-reduced-motion:reduce){#特效字.显{animation:none}}
+
+#全屏闪{position:absolute;inset:0;z-index:8;pointer-events:none;opacity:0;background:#fff;mix-blend-mode:screen;transition:opacity .12s ease}
+#全屏闪.显{opacity:.55}
+@media(prefers-reduced-motion:reduce){#全屏闪.显{opacity:.25}}
