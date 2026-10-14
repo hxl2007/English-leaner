@@ -29,6 +29,7 @@ html,body{margin:0;height:100%;background:#070b14;color:#e2e8f0;font-family:syst
 .选项列 button.对{border-color:#34d399;background:rgba(16,185,129,.25)}
 .选项列 button.错{border-color:#fb7185;background:rgba(244,63,94,.2)}
 .提示行{margin:10px 0 0;font-size:12px;color:#94a3b8}
+[hidden]{display:none !important}
 .遮罩{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.72);backdrop-filter:blur(4px)}
 .卡{background:#0f172a;border:1px solid rgba(148,163,184,.25);border-radius:18px;padding:28px 24px;width:min(420px,calc(100% - 32px));text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.45)}
 .卡 h1{margin:8px 0 10px;font-size:28px}
