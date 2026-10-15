@@ -254,3 +254,26 @@
 .修为结算{margin:.75rem 0;padding:.65rem .9rem;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;color:#92400e}
 .修为结算 strong{color:#b45309;font-size:1.15em}
 .知识点按钮 small{display:block;margin-top:4px;opacity:.85}
+
+
+/* 套题考察模块 */
+.套题考察{margin:1.25rem 0 1.75rem;padding:1.25rem 1.35rem;border:1px solid color-mix(in srgb,var(--首页主色,#18745e) 28%,transparent);border-radius:18px;background:linear-gradient(180deg,color-mix(in srgb,var(--首页主色,#18745e) 8%,#fff),#fff);}
+.套题考察 .专项标题行{display:flex;justify-content:space-between;gap:1rem;align-items:flex-end;margin-bottom:.6rem;}
+.套题结构卡{margin:.75rem 0 1rem;}
+.套题结构列表{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.55rem;}
+.套题结构列表 li{display:flex;flex-direction:column;gap:.2rem;padding:.7rem .85rem;border-radius:12px;background:#fff;border:1px solid #e5efe9;}
+.套题结构列表 strong{font-size:.92rem;}
+.套题结构列表 span,.套题时长{font-size:.86rem;color:#4a5c55;}
+.套题时长{margin:.65rem 0 0;}
+.套题知识点覆盖 details{margin:0 0 1rem;}
+.套题知识点网格{display:grid;gap:1rem;}
+.套题知识点网格 section h3{margin:.4rem 0 .45rem;font-size:1rem;}
+.套题知识点网格 ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.4rem;}
+.套题知识点网格 li{display:flex;justify-content:space-between;gap:.4rem;padding:.45rem .6rem;border-radius:10px;font-size:.84rem;background:#f4f7f5;border:1px solid #e2ebe6;}
+.套题知识点网格 li.已覆盖{background:color-mix(in srgb,#18745e 12%,#fff);border-color:color-mix(in srgb,#18745e 30%,#e2ebe6);}
+.套题知识点网格 li.待补练{opacity:.78;}
+.套题知识点网格 li small{color:#5a6e66;white-space:nowrap;}
+.套题主卡{padding:1.1rem 1.2rem;border-radius:16px;background:#fff;border:1px solid #d7e6de;box-shadow:0 8px 24px rgba(24,116,94,.06);}
+.套题主卡 h3{margin:.55rem 0 .35rem;}
+.套题主卡 .练习按钮{margin-top:.75rem;}
+@media (max-width:720px){.套题考察{padding:1rem;}}

@@ -6,7 +6,7 @@ export function 验证专业课题库(库){
   for(const 卷 of 库.试卷){
     const 年份有效=['原卷转载','照片试题'].includes(卷.类型)?(卷.类型==='照片试题'&&卷.年份===null)||Number.isInteger(卷.年份)&&卷.年份>=1990&&卷.年份<=2100:卷.年份===null;
     const 样题年代有效=卷.类型!=='官方样题'||Number.isInteger(卷.文献年份)&&卷.文献年份>=1990&&卷.文献年份<=2100;
-    if(typeof 卷.编号!=='string'||卷号.has(卷.编号)||!库.院校.includes(卷.院校)||!['高等数学','C语言'].includes(卷.科目)||!['原卷转载','复习题','官方样题','照片试题','同型练习'].includes(卷.类型)||!年份有效||!样题年代有效||!Array.isArray(卷.题目)||!卷.题目.length)throw new Error('试卷的院校、年份或题目不完整。');
+    if(typeof 卷.编号!=='string'||卷号.has(卷.编号)||!库.院校.includes(卷.院校)||!['高等数学','C语言'].includes(卷.科目)||!['原卷转载','复习题','官方样题','照片试题','同型练习','模拟套题'].includes(卷.类型)||!年份有效||!样题年代有效||!Array.isArray(卷.题目)||!卷.题目.length)throw new Error('试卷的院校、年份或题目不完整。');
     卷号.add(卷.编号);
     for(const q of 卷.题目){
       if(typeof q.编号!=='string'||题号.has(q.编号)||!q.题干||!['单选','填空','计算','证明','简答','编程'].includes(q.题型)||!Number.isInteger(q.分值)||q.分值<=0)throw new Error('试卷题目或分值无效。');

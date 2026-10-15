@@ -8,7 +8,7 @@ const 参数=new URLSearchParams(location.search),科目=参数.get('科目')===
 const 显示科目=科目==='C语言'?'C 语言 · 程序设计基础':'高等数学 · 应用数学基础';
 const $=选择=>document.querySelector(选择);
 const 转义=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const 年份说明=卷=>卷.年份?`${卷.年份} 年`:卷.类型==='官方样题'?`官方样题 · ${卷.文献年份} 年发布`:卷.类型==='照片试题'?'照片整理 · 年份未注明':卷.类型==='同型练习'?'按考点练习':`教材复习${卷.文献年份?' · '+卷.文献年份+' 版':''}`;
+const 年份说明=卷=>卷.年份?`${卷.年份} 年`:卷.类型==='模拟套题'?`模拟套题 · 依据联大大纲${卷.文献年份?' · '+卷.文献年份:''}`:卷.类型==='官方样题'?`官方样题 · ${卷.文献年份} 年发布`:卷.类型==='照片试题'?'照片整理 · 年份未注明':卷.类型==='同型练习'?'按考点练习':`教材复习${卷.文献年份?' · '+卷.文献年份+' 版':''}`;
 function 来源地址(值){try{const u=new URL(值);return ['https:','http:'].includes(u.protocol)?转义(u.href):'';}catch{return '';}}
 function 原卷地址(值){return typeof 值==='string'&&值.startsWith('北京专升本资料/')&&!值.includes('..')?转义(encodeURI('./'+值)):'';}
 function 查卷(编号,存档=本机.草稿[编号]){
@@ -19,8 +19,24 @@ function 数学条件(){return {知识点:$('#数学知识点').value,难度:$('
 function 新专项进度(卷,条件){
   const 新=新建专业课练习(卷);新.数学题号=卷.题目.map(q=>q.编号);新.数学标题=卷.名称;新.数学条件=条件;return 新;
 }
+function 设置套题考察(){
+  if(科目!=='高等数学'||!库.数学?.套题考察){const b=$('#套题考察区');if(b)b.hidden=true;return;}
+  const 区=$('#套题考察区');if(!区)return;区.hidden=false;
+  const 元=库.数学.套题考察;
+  const 卷列表=(元.试卷编号||[]).map(id=>库.试卷.find(v=>v.编号===id)).filter(Boolean);
+  $('#套题考察说明').textContent=元.说明+' 结构：'+(元.结构||'')+'。本卷直接考查 '+(元.本卷覆盖数||0)+' / '+(元.大纲内知识点总数||0)+' 个大纲内知识点；其余可在下方专项刷题补练。';
+  const 结构=卷列表[0]?.结构说明||{};
+  $('#套题结构卡').innerHTML=`<ul class="套题结构列表">${['选择题','填空题','计算题','证明题'].map(k=>结构[k]?`<li><strong>${转义(k)}</strong><span>${转义(结构[k])}</span></li>`:'').join('')}${结构.合计?`<li><strong>合计</strong><span>${转义(结构.合计)}</span></li>`:''}</ul><p class="套题时长">建议作答 ${卷列表[0]?.建议时长分钟||150} 分钟 · 满分 ${卷列表[0]?.满分||100} 分 · 完成约 +${卷列表[0]?专业课奖励上限(卷列表[0]):80} 修为</p>`;
+  const 覆盖=new Set(元.本卷覆盖知识点||[]);
+  $('#套题知识点覆盖').innerHTML=`<details open><summary>本卷知识点覆盖（${覆盖.size} 个）</summary><div class="套题知识点网格">${(库.数学.章节||[]).filter(ch=>ch.名称!=='最高难度拓展').map(章=>`<section><h3>${转义(章.名称)}</h3><ul>${章.考点.map(点=>`<li class="${覆盖.has(点.名称)?'已覆盖':'待补练'}"><span>${转义(点.名称)}</span><small>${覆盖.has(点.名称)?'本卷已考':'专项补练'}</small></li>`).join('')}</ul></section>`).join('')}</div></details>`;
+  $('#套题试卷入口').innerHTML=卷列表.map(卷=>{
+    const 草稿=本机.草稿[卷.编号];
+    return `<article class="套题主卡"><div class="资料标签"><span>北京联合大学</span><span>模拟套题</span><span class="整卷标签">套题考察</span><span class="修为标签">约 +${专业课奖励上限(卷)} 修为</span></div><h3>${转义(卷.名称)}</h3><p>${卷.题目.length} 道题 · ${卷.满分} 分 · ${转义(年份说明(卷))}</p><p class="来源说明">${转义(卷.来源说明||'')}</p><button class="练习按钮" data-action="开卷" data-paper="${转义(卷.编号)}">${草稿?'继续套题作答':'开始套题考察'} <span aria-hidden="true">→</span></button></article>`;
+  }).join('')||'<p>暂无套题。</p>';
+}
 function 设置数学入口(){
   if(科目!=='高等数学'||!库.数学)return;
+  设置套题考察();
   $('#数学专项区').hidden=false;
   $('#数学大纲链接').href=原卷地址(库.数学.大纲存档);
   const 考点=库.数学.章节.flatMap(x=>x.考点);
@@ -36,6 +52,7 @@ function 设置数学入口(){
   const 待核=库.数学.待核照片题||[];$('#照片待核区').hidden=!待核.length;$('#待核题标题').textContent=`照片中缺少条件的题目（${待核.length} 道）`;
   $('#照片待核清单').innerHTML=待核.map(q=>{const v=库.试卷.find(v=>v.编号===q.试卷);return `<article><h3>${转义(v?.名称||'')} · 原题 ${转义(q.题号)}</h3><p>${转义(q.题干)}</p><p>${转义(q.原因)}</p><a href="${原卷地址(q.原卷)}#page${q.照片页}" target="_blank" rel="noopener noreferrer">查看照片第 ${q.照片页} 页 ↗</a></article>`;}).join('');
   渲染数学入口();
+  if(科目==='高等数学')设置套题考察();
 }
 function 渲染数学入口(){
   if(科目!=='高等数学'||!库.数学)return;
@@ -94,28 +111,30 @@ function 更新年份(){
   const 年份=[...new Set(库.试卷.filter(x=>x.科目===科目&&(院校==='全部'||x.院校===院校)).map(x=>x.年份).filter(Number.isInteger))].sort((a,b)=>b-a);
   const 有复习=库.试卷.some(x=>x.科目===科目&&x.类型==='复习题'&&(院校==='全部'||x.院校===院校));
   const 有样题=库.试卷.some(x=>x.科目===科目&&x.类型==='官方样题'&&(院校==='全部'||x.院校===院校));
-  $('#试卷年份').innerHTML='<option value="全部">全部试题</option>'+年份.map(x=>`<option value="${x}">${x} 年</option>`).join('')+(有样题?'<option value="样题">官方样题（非年度原卷）</option>':'')+(有复习?'<option value="复习">教材复习（非年度原卷）</option>':'');
+  const 有套题=库.试卷.some(x=>x.科目===科目&&x.类型==='模拟套题'&&(院校==='全部'||x.院校===院校));
+  $('#试卷年份').innerHTML='<option value="全部">全部试题</option>'+(有套题?'<option value="套题">套题考察（模拟整卷）</option>':'')+年份.map(x=>`<option value="${x}">${x} 年</option>`).join('')+(有样题?'<option value="样题">官方样题（非年度原卷）</option>':'')+(有复习?'<option value="复习">教材复习（非年度原卷）</option>':'');
 }
 function 试卷卡(卷){
   const 草稿=本机.草稿[卷.编号],来源=来源地址(卷.来源),原卷=原卷地址(卷.原卷);
-  const 整卷按钮=草稿?'继续整卷作答':(['原卷转载','照片试题','官方样题'].includes(卷.类型)?'整卷开练':'开始答题');
+  const 整卷按钮=草稿?'继续整卷作答':(['原卷转载','照片试题','官方样题','模拟套题'].includes(卷.类型)?(卷.类型==='模拟套题'?'开始套题考察':'整卷开练'):'开始答题');
   const 修为提示=专业课预计修为文案(卷);
-  return `<article class="试卷卡"><header><div class="资料标签"><span>${转义(卷.院校)}</span><span>${转义(年份说明(卷))}</span><span>${转义(卷.类型)}</span>${['原卷转载','照片试题'].includes(卷.类型)?'<span class="整卷标签">整套原卷</span>':''}<span class="修为标签" title="${转义(修为提示)}">完成约 +${专业课奖励上限(卷)} 修为</span></div><h2>${转义(卷.名称)}</h2></header><p class="试卷题量">${卷.题目.length} 道题 · ${卷.满分} 分${卷.类型==='复习题'||卷.练习分值?' · 练习分值':''} · <strong class="修为预告">${转义(修为提示)}</strong></p>${卷.来源说明?`<p class="来源说明">${转义(卷.来源说明)}</p>`:''}<p class="整卷提示">按试卷全部题目依次作答；选择题自动判分，填空/计算等可上传截图后点「判分」自动自评。</p><div class="试卷动作"><button class="练习按钮" data-action="开卷" data-paper="${转义(卷.编号)}">${整卷按钮}<span aria-hidden="true"> →</span></button>${原卷?`<a class="首页文字链接" href="${原卷}" target="_blank" rel="noopener noreferrer">${转义(卷.对照名称||'对照原卷')} ↗</a>`:''}${来源?`<a class="首页文字链接" href="${来源}" target="_blank" rel="noopener noreferrer">试题来源 ↗</a>`:''}</div></article>`;
+  return `<article class="试卷卡"><header><div class="资料标签"><span>${转义(卷.院校)}</span><span>${转义(年份说明(卷))}</span><span>${转义(卷.类型)}</span>${['原卷转载','照片试题'].includes(卷.类型)?'<span class="整卷标签">整套原卷</span>':卷.类型==='模拟套题'?'<span class="整卷标签">套题考察</span>':''}<span class="修为标签" title="${转义(修为提示)}">完成约 +${专业课奖励上限(卷)} 修为</span></div><h2>${转义(卷.名称)}</h2></header><p class="试卷题量">${卷.题目.length} 道题 · ${卷.满分} 分${卷.类型==='复习题'||卷.练习分值?' · 练习分值':''} · <strong class="修为预告">${转义(修为提示)}</strong></p>${卷.来源说明?`<p class="来源说明">${转义(卷.来源说明)}</p>`:''}<p class="整卷提示">按试卷全部题目依次作答；选择题自动判分，填空/计算等可上传截图后点「判分」自动自评。</p><div class="试卷动作"><button class="练习按钮" data-action="开卷" data-paper="${转义(卷.编号)}">${整卷按钮}<span aria-hidden="true"> →</span></button>${原卷?`<a class="首页文字链接" href="${原卷}" target="_blank" rel="noopener noreferrer">${转义(卷.对照名称||'对照原卷')} ↗</a>`:''}${来源?`<a class="首页文字链接" href="${来源}" target="_blank" rel="noopener noreferrer">试题来源 ↗</a>`:''}</div></article>`;
 }
 function 渲染选卷(){
   const 院校=$('#试卷院校').value,年份=$('#试卷年份').value,关键词=$('#搜索试卷').value.trim().toLowerCase();
   const 同科=库.试卷.filter(x=>x.科目===科目&&x.类型!=='同型练习'),本校=同科.filter(x=>院校==='全部'||x.院校===院校);
-  const 匹配=本校.filter(x=>(年份==='全部'||年份==='复习'&&x.类型==='复习题'||年份==='样题'&&x.类型==='官方样题'||String(x.年份)===年份)&&`${x.院校} ${x.年份||x.文献年份||''} ${x.名称}`.toLowerCase().includes(关键词));
+  const 匹配=本校.filter(x=>(年份==='全部'||年份==='套题'&&x.类型==='模拟套题'||年份==='复习'&&x.类型==='复习题'||年份==='样题'&&x.类型==='官方样题'||String(x.年份)===年份)&&`${x.院校} ${x.年份||x.文献年份||''} ${x.名称}`.toLowerCase().includes(关键词));
   $('#试卷统计').textContent=`${院校==='全部'?'全部院校':院校} · ${本校.length} 套可作答试题 · ${本校.reduce((n,x)=>n+x.题目.length,0)} 道题 · 当前显示 ${匹配.length} 套`;
   $('#试卷清单').innerHTML=匹配.length?匹配.map(试卷卡).join(''):`<div class="题库空状态"><h2>${本校.length?'没有符合筛选条件的试题':'当前院校暂无已核对的试题'}</h2><p>${本校.length?'请调整年份或关键词。':`尚未找到可公开读取、能核对题目内容的${转义(院校==='全部'?'本类':院校)}${转义(科目)}历年原卷。`}</p></div>`;
   const 其他=本校.length?[]:同科.filter(x=>x.院校!==院校);
   $('#其他院校').hidden=!其他.length;$('#其他院校').innerHTML=其他.length?`<h2>其他院校已收录试题</h2><p>以下试题属于对应院校，可先选择一套练习。</p><div class="资料清单">${其他.map(试卷卡).join('')}</div>`:'';
   const 原卷年份=本校.filter(x=>x.类型==='原卷转载').map(x=>x.年份).sort((a,b)=>a-b);
   const 照片=本校.filter(x=>x.类型==='照片试题');
-  $('#年份覆盖').innerHTML=`<h2>历年试题收录情况</h2><p>${转义(院校==='全部'?'当前院校':院校)}${转义(科目)}已录入的原卷转载年份：${原卷年份.length?转义([...new Set(原卷年份)].join('、')):'暂无'}。</p><p>另有 ${照片.length} 套照片整理、${本校.filter(x=>x.类型==='官方样题').length} 套官方样题、${本校.filter(x=>x.类型==='复习题').length} 套教材复习。${照片.some(x=>x.年份===null)?'联大照片只注明讲次，未推断考试年份。':''}考试大纲与同型练习均不计为历年真题。</p><p>未集齐全部年份。</p>`;
+  $('#年份覆盖').innerHTML=`<h2>历年试题收录情况</h2><p>${转义(院校==='全部'?'当前院校':院校)}${转义(科目)}已录入的原卷转载年份：${原卷年份.length?转义([...new Set(原卷年份)].join('、')):'暂无'}。</p><p>另有 ${照片.length} 套照片整理、${本校.filter(x=>x.类型==='模拟套题').length} 套模拟套题、${本校.filter(x=>x.类型==='官方样题').length} 套官方样题、${本校.filter(x=>x.类型==='复习题').length} 套教材复习。${照片.some(x=>x.年份===null)?'联大照片只注明讲次，未推断考试年份。':''}考试大纲与同型练习均不计为历年真题。</p><p>未集齐全部年份。</p>`;
   const 记录=本机.记录.flatMap(x=>{try{const v=查卷(x.试卷,x);return v?[{x,v}]:[];}catch{return [];}});
   $('#练习记录').innerHTML=记录.length?记录.map(({x,v})=>`<div class="记录行"><div><strong>${转义(v.名称)}</strong><small>${转义(new Date(x.完成时间).toLocaleString('zh-CN'))}${x.成绩?.含自评?' · 含主观题自评分':''}${x.修为!=null?` · +${x.修为} 修为`:''}</small></div><span>${转义(x.成绩?.分数)} / ${v.满分} 分</span><button class="次按钮" data-action="看记录" data-record="${转义(x.编号)}">查看作答</button></div>`).join(''):'<p class="记录空状态">完成一套试题后，成绩会显示在这里。</p>';
   渲染数学入口();
+  if(科目==='高等数学')设置套题考察();
 }
 function 定位题目(){const h=$('#题目标题');if(h)h.focus();}
 async function 读取答案(){if(!答案){const r=await fetch('./专业课答案.json',{cache:'no-cache'});if(!r.ok)throw new Error('参考答案加载失败，请保留作答并重试。');答案=await r.json();}验证专业课答案(当前卷,答案);}
@@ -161,7 +180,7 @@ function 渲染答题(){
   const 档位=练习.数学条件?.档位||$('#数学档位').value||'联大';
   const 数学元信息=q.知识点?`<div class="数学题标签"><span>${转义(q.知识点)}</span><span>${转义(题目难度(q,档位))}</span>${q.联大难度&&q.联大难度!==q.难度?`<span>${档位==='联大'?'通用：'+转义(q.难度):'联大：'+转义(q.联大难度)}</span>`:''}${q.题源类别==='同型练习'?'<span>同型练习 · 非历年真题</span>':''}${q.大纲内===false?'<span class="拓展标签">适度超纲</span>':''}</div>`:'';
   const 题目出处=对照基础?`<a href="${对照链接}" target="_blank" rel="noopener noreferrer">${转义(对照名称)}第 ${q.原卷页||''} 页 ↗</a>${q.原题名称?`<span>${转义(q.原题名称)}</span>`:''}`:来源地址(q.原题来源||当前卷.来源)?`<a href="${来源地址(q.原题来源||当前卷.来源)}" target="_blank" rel="noopener noreferrer">查看题目来源 ↗</a>`:'';
-  $('#答题区').innerHTML=`<div class="答题页眉"><button class="返回试卷" data-action="返回列表">← 选择其他试卷</button><span class="科目状态">${只读?'作答回顾':已交?'交卷后自评':'正在作答'}</span></div><header class="试卷抬头"><p class="首页眉题">${转义(当前卷.院校)} · ${转义(年份说明(当前卷))}</p><h1>${转义(当前卷.名称)}</h1><p>${总数} 道题 · 满分 ${当前卷.满分} 分 · ${转义(当前卷.类型)}</p><p class="来源说明">${转义(当前卷.来源说明)}</p></header>${成绩?`<section class="成绩卡" aria-label="练习成绩"><div><span>本次成绩</span><strong>${成绩.分数}<small> / ${成绩.满分} 分</small></strong></div><p>选择题 ${成绩.单选得分} 分 · 主观题自评 ${成绩.主观得分} 分<br>含自评分，参考答案为独立推导。</p><p class="修为结算">本次修为 <strong>+${练习.修为??成绩.修为??专业课奖励金币(当前卷,成绩.分数)}</strong>（与金币同源；满分最高 ${专业课奖励上限(当前卷)}）</p><button class="次按钮" data-action="重新练习">再练一遍</button></section>`:''}<div class="答题布局"><aside class="答题导航"><h2>题目导航</h2><p id="作答进度" role="status" aria-live="polite"></p><div class="题号网格">${当前卷.题目.map((x,i)=>`<button data-action="跳题" data-index="${i}" ${i===练习.当前题?'aria-current="step"':''}>${i+1}</button>`).join('')}</div><p class="导航说明">绿色表示${已交?'已评分':'已作答'}，深色表示当前题。</p>${只读?'':`<button class="练习按钮 交卷按钮" data-action="交卷">${已交?'完成自评并保存成绩':'交卷并查看解析'}</button>`}<p class="本机提示">进度保存在当前浏览器</p></aside><article class="专业课试题"><div id="答题错误" class="练习错误" role="alert" tabindex="-1" hidden></div><div class="题目元信息"><span>第 ${练习.当前题+1} / ${总数} 题</span><span>${转义(q.题型)} · ${q.分值} 分</span><span>${q.题源类别==='同型练习'?'练习题':'原题'} ${转义(q.题号)}</span></div>${数学元信息}<h2 id="题目标题" tabindex="-1" aria-label="${转义(q.题干)}">${q.数学排版?数学排版HTML(q.数学排版):转义(q.题干)}</h2>${q.超纲说明?`<p class="题意提示">${转义(q.超纲说明)}</p>`:''}${q.代码?`<pre class="题目代码">${转义(q.代码)}</pre>`:''}${q.核对提示?`<p class="题意提示">${转义(q.核对提示)}</p>`:''}${作答区(q)}${已交?答案区(q):''}${已交&&是主观题(q.题型)?专业课AI判题HTML(q,练习,{模式:只读?'只读':'自评',参考答案:答案?.[q.编号]?.参考答案||'',评分要点:答案?.[q.编号]?.评分要点||[]}):''}<div class="题目翻页"><button class="次按钮" data-action="上一题" ${练习.当前题===0?'disabled':''}>← 上一题</button><button class="次按钮" data-action="下一题" ${练习.当前题===总数-1?'disabled':''}>下一题 →</button></div><div class="题目出处">${题目出处}</div></article></div>`;
+  $('#答题区').innerHTML=`<div class="答题页眉"><button class="返回试卷" data-action="返回列表">← 选择其他试卷</button><span class="科目状态">${只读?'作答回顾':已交?'交卷后自评':'正在作答'}</span></div><header class="试卷抬头"><p class="首页眉题">${转义(当前卷.院校)} · ${转义(年份说明(当前卷))}</p><h1>${转义(当前卷.名称)}</h1><p>${总数} 道题 · 满分 ${当前卷.满分} 分 · ${转义(当前卷.类型)}</p><p class="来源说明">${转义(当前卷.来源说明)}</p></header>${成绩?`<section class="成绩卡" aria-label="练习成绩"><div><span>本次成绩</span><strong>${成绩.分数}<small> / ${成绩.满分} 分</small></strong></div><p>选择题 ${成绩.单选得分} 分 · 主观题自评 ${成绩.主观得分} 分<br>含自评分，参考答案为独立推导。</p><p class="修为结算">本次修为 <strong>+${练习.修为??成绩.修为??专业课奖励金币(当前卷,成绩.分数)}</strong>（与金币同源；满分最高 ${专业课奖励上限(当前卷)}）</p><button class="次按钮" data-action="重新练习">再练一遍</button></section>`:''}<div class="答题布局"><aside class="答题导航"><h2>题目导航</h2><p id="作答进度" role="status" aria-live="polite"></p><div class="题号网格">${当前卷.题目.map((x,i)=>`<button data-action="跳题" data-index="${i}" ${i===练习.当前题?'aria-current="step"':''}>${i+1}</button>`).join('')}</div><p class="导航说明">绿色表示${已交?'已评分':'已作答'}，深色表示当前题。</p>${只读?'':`<button class="练习按钮 交卷按钮" data-action="交卷">${已交?'完成自评并保存成绩':'交卷并查看解析'}</button>`}<p class="本机提示">进度保存在当前浏览器</p></aside><article class="专业课试题"><div id="答题错误" class="练习错误" role="alert" tabindex="-1" hidden></div><div class="题目元信息"><span>第 ${练习.当前题+1} / ${总数} 题</span><span>${转义(q.题型)} · ${q.分值} 分</span><span>${q.题源类别==='同型练习'?'练习题':q.题源类别==='模拟套题'?'模拟题':'原题'} ${转义(q.题号)}</span></div>${数学元信息}<h2 id="题目标题" tabindex="-1" aria-label="${转义(q.题干)}">${q.数学排版?数学排版HTML(q.数学排版):转义(q.题干)}</h2>${q.超纲说明?`<p class="题意提示">${转义(q.超纲说明)}</p>`:''}${q.代码?`<pre class="题目代码">${转义(q.代码)}</pre>`:''}${q.核对提示?`<p class="题意提示">${转义(q.核对提示)}</p>`:''}${作答区(q)}${已交?答案区(q):''}${已交&&是主观题(q.题型)?专业课AI判题HTML(q,练习,{模式:只读?'只读':'自评',参考答案:答案?.[q.编号]?.参考答案||'',评分要点:答案?.[q.编号]?.评分要点||[]}):''}<div class="题目翻页"><button class="次按钮" data-action="上一题" ${练习.当前题===0?'disabled':''}>← 上一题</button><button class="次按钮" data-action="下一题" ${练习.当前题===总数-1?'disabled':''}>下一题 →</button></div><div class="题目出处">${题目出处}</div></article></div>`;
   更新题号();
   绑定专业课AI判题($('#答题区'),{
     get练习:()=>练习,

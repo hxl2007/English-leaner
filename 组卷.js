@@ -184,7 +184,7 @@ export function 专业课奖励上限(卷){
   if(typeof 卷?.编号==='string'&&卷.编号.startsWith('数学专项-'))return Math.min(25,Math.max(5,题数));
   if(卷?.类型==='同型练习')return Math.min(25,Math.max(5,题数));
   if(卷?.类型==='复习题')return Math.min(40,Math.max(10,Math.round(满分*0.4)));
-  // 原卷转载 / 照片试题 / 官方样题：接近英语整卷上限，按满分缩放
+  // 原卷转载 / 照片试题 / 官方样题 / 模拟套题：接近英语整卷上限，按满分缩放
   return Math.min(100,Math.max(20,Math.round(满分*0.8)));
 }
 export function 专业课奖励金币(卷,分数){
