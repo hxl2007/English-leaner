@@ -7,7 +7,7 @@
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
 /* ===== 书院晨境 · 视觉升级层（2026-09-20 / frontend-design：一处张扬、其余克制；reduced-motion 全降级） ===== */
-@keyframes 入境{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes 入境{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:none}}
 @keyframes 顶入{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:none}}
 @keyframes 落定{0%{transform:scale(.97)}55%{transform:scale(1.012)}100%{transform:scale(1)}}
 @keyframes 答对光晕{0%{box-shadow:0 0 0 0 rgba(64,168,112,.5)}100%{box-shadow:0 0 0 16px rgba(64,168,112,0)}}
@@ -17,6 +17,10 @@
 @keyframes 幕入{from{opacity:0}to{opacity:1}}
 /* 开场入境：单页应用每次换页播一遍，仅首屏分区依次落定 */
 .内容>*{animation:入境 .5s cubic-bezier(.22,.9,.3,1) both}
+/* 阅读/完形二级窗口：祖先 transform 会把 position:fixed 困在内容盒内，故答题布局不参与入境位移 */
+.内容>.答题布局.含阅读{animation:none}
+.答题布局.含阅读{transform:none!important}
+
 .内容>*:nth-child(2){animation-delay:.06s}.内容>*:nth-child(3){animation-delay:.12s}.内容>*:nth-child(4){animation-delay:.18s}.内容>*:nth-child(n+5){animation-delay:.24s}
 .壳 .顶栏{animation:顶入 .45s cubic-bezier(.22,.9,.3,1) both}
 .导航 a{animation:入境 .45s cubic-bezier(.22,.9,.3,1) both}

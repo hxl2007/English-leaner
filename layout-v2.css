@@ -595,3 +595,8 @@
 }
 @media(max-width:900px){.功能网格{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:600px){.功能网格{grid-template-columns:1fr!important}}
+
+/* 阅读答题窗侧栏偏移：与 .壳 .侧栏 宽度对齐，避免二级窗口错位 */
+.壳 .含阅读 .阅读答题窗{left:240px}
+@media(max-width:900px){.壳 .含阅读 .阅读答题窗{left:80px}}
+@media(max-width:680px){.壳 .含阅读 .阅读答题窗{left:0;right:0}}
