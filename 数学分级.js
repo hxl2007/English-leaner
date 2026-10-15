@@ -7,12 +7,26 @@ export function 筛选数学题(库,{知识点='全部',难度='全部',档位='
     (知识点==='全部'||题.知识点===知识点)&&(难度==='全部'||题目难度(题,档位)===难度)&&
     (题源==='全部'||题源==='照片'&&题.题源类别==='照片原题'||题源==='练习'&&题.题源类别==='同型练习'));
 }
+export function 数学题记录(库,记录){
+  const 映射=库.题号映射||{},表=new Map(库.试卷.flatMap(v=>v.题目.map(q=>[q.编号,q]))),原表=new Map([...库.试卷,...(库.兼容试卷||[])].flatMap(v=>v.题目.map(q=>[q.编号,q]))),已练=new Set(),错题=new Set();
+  for(const r of [...记录].sort((a,b)=>(a.完成时间||0)-(b.完成时间||0))){
+    const 卷=库.试卷.find(v=>v.编号===r.试卷)||(库.兼容试卷||[]).find(v=>v.编号===r.试卷);
+    const ids=r.数学题号||卷?.题目.map(q=>q.编号)||[];
+    ids.forEach((id,i)=>{const 真号=映射[id]||id,q=表.get(真号);if(!q||!Object.hasOwn(r.作答||{},id))return;已练.add(真号);const 分=r.成绩?.单题得分?.[i]??r.自评?.[id],满分=原表.get(id)?.分值||q.分值;if(Number.isFinite(分)){if(分<满分)错题.add(真号);else 错题.delete(真号);}});
+  }
+  return {已练,错题};
+}
+export function 抽取数学题(池,数量,已练=new Set()){
+  const 未练=池.filter(x=>!已练.has(x.题.编号)),复习=池.filter(x=>已练.has(x.题.编号));
+  for(const 组 of [未练,复习])for(let i=组.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[组[i],组[j]]=[组[j],组[i]];}
+  const 题=[...未练,...复习].slice(0,数量);return {题,新题数:Math.min(未练.length,题.length),复习数:Math.max(0,题.length-未练.length)};
+}
 // 每次练习保留题号清单，刷新和查看成绩继续使用同一批题目。
 export function 组数学专项卷(库,题号,标题='数学单知识点练习',编号='数学专项'){
   if(!Array.isArray(题号)||!题号.length||题号.length>50||题号.some(x=>typeof x!=='string')||new Set(题号).size!==题号.length)throw new Error('数学练习题号无效。');
   if(!/^数学专项(?:-[a-zA-Z0-9-]{1,100})?$/.test(编号))throw new Error('数学专项编号无效。');
   if(typeof 标题!=='string'||标题.length>160)throw new Error('数学专项名称无效。');
-  const 索引=new Map(库.试卷.filter(x=>x.科目==='高等数学').flatMap(卷=>卷.题目.map(q=>[q.编号,{...q,原题卷号:卷.编号,原题名称:卷.名称,原题院校:卷.院校,原题年份:卷.年份,原题对照:卷.原卷,原题来源:卷.来源}])));
+  const 索引=new Map([...库.试卷,...(库.兼容试卷||[])].filter(x=>x.科目==='高等数学').flatMap(卷=>卷.题目.map(q=>[q.编号,{...q,原题卷号:卷.编号,原题名称:卷.名称,原题院校:卷.院校,原题年份:卷.年份,原题对照:卷.原卷,原题来源:卷.来源}])));
   const 题目=题号.map(x=>索引.get(x));
   if(题目.some(x=>!x))throw new Error('该数学练习含有未收录题目，原进度仍保留。');
   return {编号,院校:题目.every(q=>q.原题院校===题目[0].原题院校)?题目[0].原题院校:'全部',科目:'高等数学',年份:null,类型:'同型练习',名称:标题,

@@ -1,5 +1,5 @@
 import {新编号} from './组卷.js';
-import {数学难度,验证数学树} from './数学分级.js';
+import {数学难度,验证数学树,组数学专项卷} from './数学分级.js';
 export function 验证专业课题库(库){
   if(库?.版本!==1||!Array.isArray(库.院校)||!库.院校.every(x=>typeof x==='string')||!Array.isArray(库.试卷))throw new Error('专业课题库格式无效。');
   const 卷号=new Set(),题号=new Set();
@@ -67,4 +67,13 @@ export function 专业课评分(卷,练习,答案){
     主观得分+=分;return 分;
   });
   return {分数:单选得分+主观得分,满分:卷.满分,单选得分,主观得分,单题得分,含自评:卷.题目.some(q=>q.题型!=='单选')};
+}
+
+export function 验证专业课备份(库,存档){
+  if(存档?.版本!==1||!存档.草稿||!Array.isArray(存档.记录))throw new Error('专业课备份格式无效。');
+  for(const g of [...Object.values(存档.草稿),...存档.记录,...(存档.冲突副本||[]).map(x=>x.练习)]){
+    const 卷=g.数学题号?组数学专项卷(库,g.数学题号,g.数学标题,g.试卷):[...库.试卷,...(库.兼容试卷||[])].find(x=>x.编号===g.试卷);
+    if(!卷)throw new Error('备份包含未收录试卷，原存档保持不变。');验证专业课练习(g,卷);
+  }
+  return 存档;
 }
