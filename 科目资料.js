@@ -19,22 +19,53 @@ function 数学条件(){return {知识点:$('#数学知识点').value,难度:$('
 function 新专项进度(卷,条件){
   const 新=新建专业课练习(卷);新.数学题号=卷.题目.map(q=>q.编号);新.数学标题=卷.名称;新.数学条件=条件;return 新;
 }
+function 套题完成过(编号){
+  return 本机.记录.some(x=>x.试卷===编号&&x.阶段==='完成');
+}
+function 下一套轮刷编号(卷列表){
+  if(!卷列表.length)return '';
+  const 未完成草稿=卷列表.find(v=>本机.草稿[v.编号]);
+  if(未完成草稿)return 未完成草稿.编号;
+  const 未做过=卷列表.find(v=>!套题完成过(v.编号));
+  if(未做过)return 未做过.编号;
+  // 全部做过：按最近完成时间，取下一套轮换
+  const 完成序=卷列表.map(v=>{
+    const r=本机.记录.find(x=>x.试卷===v.编号&&x.阶段==='完成');
+    return {编号:v.编号,时间:r?.完成时间||0};
+  }).sort((a,b)=>b.时间-a.时间);
+  const 最近=完成序[0]?.编号;
+  const i=卷列表.findIndex(v=>v.编号===最近);
+  return 卷列表[(i+1)%卷列表.length].编号;
+}
 function 设置套题考察(){
   if(科目!=='高等数学'||!库.数学?.套题考察){const b=$('#套题考察区');if(b)b.hidden=true;return;}
   const 区=$('#套题考察区');if(!区)return;区.hidden=false;
   const 元=库.数学.套题考察;
   const 卷列表=(元.试卷编号||[]).map(id=>库.试卷.find(v=>v.编号===id)).filter(Boolean);
-  $('#套题考察说明').textContent=元.说明+' 结构：'+(元.结构||'')+'。本卷直接考查 '+(元.本卷覆盖数||0)+' / '+(元.大纲内知识点总数||0)+' 个大纲内知识点；其余可在下方专项刷题补练。';
+  const 合计覆盖=元.套题合计覆盖数??元.本卷覆盖数??0;
+  const 大纲总=元.大纲内知识点总数||0;
+  $('#套题考察说明').textContent=`${元.说明} 共 ${卷列表.length} 套可轮换。统一结构：${元.结构||''}。四套合计直接考查 ${合计覆盖} / ${大纲总} 个大纲内知识点。`;
   const 结构=卷列表[0]?.结构说明||{};
-  $('#套题结构卡').innerHTML=`<ul class="套题结构列表">${['选择题','填空题','计算题','证明题'].map(k=>结构[k]?`<li><strong>${转义(k)}</strong><span>${转义(结构[k])}</span></li>`:'').join('')}${结构.合计?`<li><strong>合计</strong><span>${转义(结构.合计)}</span></li>`:''}</ul><p class="套题时长">建议作答 ${卷列表[0]?.建议时长分钟||150} 分钟 · 满分 ${卷列表[0]?.满分||100} 分 · 完成约 +${卷列表[0]?专业课奖励上限(卷列表[0]):80} 修为</p>`;
-  const 覆盖=new Set(元.本卷覆盖知识点||[]);
-  $('#套题知识点覆盖').innerHTML=`<details open><summary>本卷知识点覆盖（${覆盖.size} 个）</summary><div class="套题知识点网格">${(库.数学.章节||[]).filter(ch=>ch.名称!=='最高难度拓展').map(章=>`<section><h3>${转义(章.名称)}</h3><ul>${章.考点.map(点=>`<li class="${覆盖.has(点.名称)?'已覆盖':'待补练'}"><span>${转义(点.名称)}</span><small>${覆盖.has(点.名称)?'本卷已考':'专项补练'}</small></li>`).join('')}</ul></section>`).join('')}</div></details>`;
-  $('#套题试卷入口').innerHTML=卷列表.map(卷=>{
+  const 修为样=卷列表[0]?专业课奖励上限(卷列表[0]):80;
+  $('#套题结构卡').innerHTML=`<ul class="套题结构列表">${['选择题','填空题','计算题','证明题'].map(k=>结构[k]?`<li><strong>${转义(k)}</strong><span>${转义(结构[k])}</span></li>`:'').join('')}${结构.合计?`<li><strong>合计</strong><span>${转义(结构.合计)}</span></li>`:''}</ul><p class="套题时长">每套建议 ${卷列表[0]?.建议时长分钟||150} 分钟 · 满分 ${卷列表[0]?.满分||100} 分 · 完成约 +${修为样} 修为（按得分比例）</p>`;
+  const 下一=下一套轮刷编号(卷列表);
+  const 下一卷=卷列表.find(v=>v.编号===下一);
+  const 草稿中=卷列表.filter(v=>本机.草稿[v.编号]).length;
+  const 已完成=卷列表.filter(v=>套题完成过(v.编号)).length;
+  $('#套题轮刷栏').innerHTML=`<div class="轮刷状态"><span>进度：已完成 ${已完成} / ${卷列表.length} 套${草稿中?` · ${草稿中} 套未交卷`:''}</span></div><div class="轮刷动作"><button type="button" class="练习按钮" data-action="套题轮刷" ${下一?'':'disabled'}>${本机.草稿[下一]?'继续未完成套题':已完成>=卷列表.length&&卷列表.length?'下一套轮刷重练':'开始下一套轮刷'} <span aria-hidden="true">→</span></button>${下一卷?`<p class="轮刷提示">将打开：${转义(下一卷.名称)}</p>`:''}</div>`;
+  $('#套题试卷入口').innerHTML=`<div class="套题卡片网格">${卷列表.map((卷,i)=>{
     const 草稿=本机.草稿[卷.编号];
-    return `<article class="套题主卡"><div class="资料标签"><span>北京联合大学</span><span>模拟套题</span><span class="整卷标签">套题考察</span><span class="修为标签">约 +${专业课奖励上限(卷)} 修为</span></div><h3>${转义(卷.名称)}</h3><p>${卷.题目.length} 道题 · ${卷.满分} 分 · ${转义(年份说明(卷))}</p><p class="来源说明">${转义(卷.来源说明||'')}</p><button class="练习按钮" data-action="开卷" data-paper="${转义(卷.编号)}">${草稿?'继续套题作答':'开始套题考察'} <span aria-hidden="true">→</span></button></article>`;
-  }).join('')||'<p>暂无套题。</p>';
+    const 完成=套题完成过(卷.编号);
+    const 覆盖数=(元.各卷覆盖&&元.各卷覆盖[卷.编号])||卷.题目.reduce((s,q)=>{s.add(q.知识点);return s;},new Set()).size;
+    const 状态=草稿?'未交卷续做':完成?'已完成可重练':'未做';
+    const 钮=草稿?'继续作答':完成?'再练本套':'开始本套';
+    return `<article class="套题主卡${下一===卷.编号?' 轮刷推荐':''}"><div class="资料标签"><span>第 ${i+1} 套</span><span class="套题状态标签">${状态}</span><span class="修为标签">约 +${专业课奖励上限(卷)} 修为</span></div><h3>${转义(卷.名称)}</h3><p>${卷.题目.length} 道题 · ${卷.满分} 分 · 本套约 ${覆盖数} 个知识点</p><button class="练习按钮" data-action="开卷" data-paper="${转义(卷.编号)}">${钮} <span aria-hidden="true">→</span></button></article>`;
+  }).join('')}</div>`;
+  const 覆盖=new Set(元.本卷覆盖知识点||[]);
+  $('#套题知识点覆盖').innerHTML=`<details><summary>四套合计知识点覆盖（${覆盖.size} / ${大纲总}）</summary><div class="套题知识点网格">${(库.数学.章节||[]).filter(ch=>ch.名称!=='最高难度拓展').map(章=>`<section><h3>${转义(章.名称)}</h3><ul>${章.考点.map(点=>`<li class="${覆盖.has(点.名称)?'已覆盖':'待补练'}"><span>${转义(点.名称)}</span><small>${覆盖.has(点.名称)?'套题已覆盖':'专项补练'}</small></li>`).join('')}</ul></section>`).join('')}</div></details>`;
 }
 function 设置数学入口(){
+
   if(科目!=='高等数学'||!库.数学)return;
   设置套题考察();
   $('#数学专项区').hidden=false;

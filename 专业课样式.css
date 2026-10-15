@@ -277,3 +277,11 @@
 .套题主卡 h3{margin:.55rem 0 .35rem;}
 .套题主卡 .练习按钮{margin-top:.75rem;}
 @media (max-width:720px){.套题考察{padding:1rem;}}
+
+.套题轮刷栏{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem 1.25rem;margin:0 0 1rem;padding:.85rem 1rem;border-radius:14px;background:#fff;border:1px solid #d7e6de;}
+.轮刷状态{font-size:.92rem;color:#3d534a;}
+.轮刷动作{display:flex;flex-direction:column;align-items:flex-start;gap:.35rem;}
+.轮刷提示{margin:0;font-size:.84rem;color:#5a6e66;}
+.套题卡片网格{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.85rem;}
+.套题主卡.轮刷推荐{border-color:color-mix(in srgb,#18745e 55%,#d7e6de);box-shadow:0 10px 28px rgba(24,116,94,.12);}
+.套题状态标签{background:color-mix(in srgb,#18745e 14%,#fff);color:#0f5a48;}
